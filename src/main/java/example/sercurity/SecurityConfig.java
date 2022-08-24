@@ -26,13 +26,13 @@ import example.service.impl.UserService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-	AuthenticationManager authenticationManager;
+	AuthenticationManager authenticationManager;//???
 
 	@Autowired
 	UserService userService;
 	
-	@Autowired
-	private AuthEntryPointJwt unauthorizedHandler;
+//	@Autowired
+//	private AuthEntryPointJwt unauthorizedHandler;
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -50,18 +50,37 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	public DaoAuthenticationProvider authenticationProvider() {
+	    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+	     
+	    authProvider.setUserDetailsService(userService);
+	    authProvider.setPasswordEncoder(passwordEncoder());
+	 
+	    return authProvider;
+	}
+	
+	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
- 		http.csrf().disable().authorizeRequests().antMatchers("/auth/register").permitAll();
- 		http.csrf().disable().authorizeRequests().antMatchers("/auth/forgotpassword").permitAll();
-		http.cors().and().authorizeRequests().antMatchers("/auth/login").permitAll().anyRequest().authenticated();
+		http.cors().and().csrf().disable();
+		
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+		
+		http.authenticationProvider(authenticationProvider());
+		
+		http.authorizeHttpRequests()
+				.antMatchers("/auth/register").permitAll()
+				.antMatchers("/auth/forgotpassword").permitAll()
+				.antMatchers("/auth/login").permitAll()
+				.anyRequest().authenticated();
+		
 
 //		http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 //				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
 //				.antMatchers("/auth/**").permitAll().antMatchers("/test/**").permitAll().anyRequest()
 //				.authenticated();
-
-		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
