@@ -1,0 +1,102 @@
+package example.api;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import example.entity.RefreshTokenEntity;
+import example.entity.UserEntity;
+import example.exception.TokenRefreshException;
+import example.exception.UserNotFoundException;
+import example.payload.request.ForgotPasswordRequest;
+import example.payload.request.LoginRequest;
+import example.payload.request.RegisterRequest;
+import example.payload.request.TokenRefreshRequest;
+import example.payload.response.ForgotPasswordResponse;
+import example.payload.response.LoginResponse;
+import example.payload.response.TokenRefreshResponse;
+import example.sercurity.jwt.CustomUserDetails;
+import example.sercurity.jwt.JwtTokenProvider;
+import example.service.IUserService;
+import example.service.impl.RefreshTokenService;
+import net.bytebuddy.utility.RandomString;
+
+@CrossOrigin
+@RestController
+public class AuthAPI {
+
+	@Autowired
+	private IUserService userService;
+
+	@Autowired
+	RefreshTokenService refreshTokenService;
+
+	@Autowired
+	private JwtTokenProvider tokenProvider;
+
+	@Autowired
+	AuthenticationManager authenticationManager;
+
+	@PostMapping(value = "/auth/register")
+	public String createUser(@RequestBody RegisterRequest model) {
+		return userService.createUser(model);
+	}
+
+	@PostMapping("/auth/login")
+	public LoginResponse authenticateUser(@RequestBody LoginRequest loginRequest) {
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		String jwt = tokenProvider.generateJwtToken(userDetails);
+		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+				.collect(Collectors.toList());
+		RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+		return new LoginResponse(jwt, refreshToken.getToken(), userDetails.getId(), userDetails.getUsername(),
+				userDetails.getEmail(), roles);
+	}
+
+	@PostMapping("/auth/refreshtoken")
+	public ResponseEntity<?> refreshtoken(@RequestBody TokenRefreshRequest request) {
+		String requestRefreshToken = request.getRefreshToken();
+		return refreshTokenService.findByToken(requestRefreshToken)
+				.map(refreshTokenService::verifyExpiration)
+				.map(RefreshTokenEntity::getUser).map(user -> {
+					String token = tokenProvider.generateTokenFromUsername(user.getUsername());
+					return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+				})
+				.orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
+	}
+	
+	@PostMapping("/auth/forgotpassword")
+	public ForgotPasswordResponse forgotPassword(@RequestBody ForgotPasswordRequest request) {
+	    String token = RandomString.make(30);
+	    userService.updateResetPasswordToken(token, request.getEmail());
+	   
+	    return new ForgotPasswordResponse(token);
+    }
+	
+//	@PostMapping("/reset_password")
+//    public String resetPassword() {
+// 
+//    }
+
+}
