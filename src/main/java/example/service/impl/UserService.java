@@ -39,7 +39,7 @@ public class UserService implements IUserService, UserDetailsService {
 			entity.setLastname(request.getLastname());
 			entity.setPassword(request.getPassword());
 			entity.setPhone(request.getPhone());
-			entity.setRole(roleEntity);
+			entity.setRoleUser(roleEntity);
 			entity.setPassword(new BCryptPasswordEncoder().encode(entity.getPassword()));
 			// Save to database
 			entity = userRepository.save(entity);
@@ -62,7 +62,6 @@ public class UserService implements IUserService, UserDetailsService {
 		UserEntity user = userRepository.findOneByEmail(email);
 		if (user != null) {
 			user.setResetPasswordToken(token);
-			System.out.println("123: " + user.getResetPasswordToken());
 			userRepository.save(user);
 		} else {
 			new UserNotFoundException("Could not find any user with the email " + email);

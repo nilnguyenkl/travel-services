@@ -1,5 +1,7 @@
 package example.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -12,19 +14,30 @@ import javax.persistence.Id;
 
 
 @Entity
-@Table(name = "comments")
-public class CommentEntity {
+@Table(name = "review")
+public class ReviewEntity {
 	
 	@Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
 	
-	@Column
+	@Column(columnDefinition = "TEXT")
 	private String content;
 	
+	@Column
+	private Date createDate;
+	
+	@Column
+	private Date modifiedDate;
+	
 	@ManyToOne
-	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "user_id_fk"))
-    private UserEntity user;
+	@JoinColumn(name = "service_id", foreignKey = @ForeignKey(name = "service_id_fk_review"))
+    private ServiceEntity serviceReview;
+	
+	@ManyToOne
+	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "user_id_fk_review"))
+    private UserEntity userReview;
+	
 
 	public String getContent() {
 		return content;
@@ -32,14 +45,6 @@ public class CommentEntity {
 
 	public void setContent(String content) {
 		this.content = content;
-	}
-
-	public UserEntity getUser() {
-		return user;
-	}
-
-	public void setUser(UserEntity user) {
-		this.user = user;
 	}
 
 }

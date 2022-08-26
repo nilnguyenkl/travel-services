@@ -11,7 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "role")
 public class RoleEntity {
 	
 	@Id
@@ -21,8 +21,16 @@ public class RoleEntity {
 	@Column
 	private String role;
 	
-	@OneToMany(mappedBy = "role")
-	private List<UserEntity> luser = new ArrayList<>();
+	@OneToMany(mappedBy = "roleUser")
+	private List<UserEntity> listUser = new ArrayList<>();
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
 
 	public String getRole() {
 		return role;
@@ -32,11 +40,11 @@ public class RoleEntity {
 		this.role = role;
 	}
 
-	public List<UserEntity> getLuser() {
-		return luser;
+	public List<UserEntity> getListUser() {
+		return listUser;
 	}
 
-	public void setLuser(List<UserEntity> luser) {
-		this.luser = luser;
+	public void setListUser(List<UserEntity> listUser) {
+		this.listUser = listUser;
 	}
 }

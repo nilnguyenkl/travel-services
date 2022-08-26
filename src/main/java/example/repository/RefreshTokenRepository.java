@@ -10,9 +10,6 @@ import example.entity.UserEntity;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity, Long> {
 	
-//	@Override
-//    Optional<RefreshTokenEntity> findById(Long id);
-	
 	Optional<RefreshTokenEntity> findByToken(String token);
     
     @Modifying

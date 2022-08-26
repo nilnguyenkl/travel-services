@@ -10,7 +10,6 @@ public class LoginResponse {
 	private String username;
 	private String email;
 	private List<String> roles;
-	private String accessToken;
 	private String refreshToken;
 
 	public LoginResponse(String accessToken, String refreshToken, Long id, String username, String email, List<String> roles) {

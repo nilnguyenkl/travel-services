@@ -1,7 +1,6 @@
 package example.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -16,24 +15,27 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "orderitem")
-public class OrderItemEntity {
+@Table(name = "ticket")
+public class TicketEntity {
 	
 	@Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 	
-	@ManyToOne
-	@JoinColumn(name = "order_id", foreignKey = @ForeignKey(name = "order_id_fk_orderitem"))
-    private OrderEntity orderOrderItem;
-	
-	@ManyToOne
-	@JoinColumn(name = "service_id", foreignKey = @ForeignKey(name = "service_id_fk_orderitem"))
-    private ServiceEntity serviceOrderItem;
-	
-	@OneToMany(mappedBy = "orderItemBy")
-	private List<OrderByTicketEntity> listOrderByTicket = new ArrayList<>();
+	@Column
+	private int value;
 	
 	@Column
-	private Date bookingDate;
+	private String type;
+	
+	@Column
+	private String note;
+	
+	@ManyToOne
+	@JoinColumn(name = "service_id", foreignKey = @ForeignKey(name = "service_id_fk_ticket"))
+    private ServiceEntity serviceTicket;
+	
+	@OneToMany(mappedBy = "ticketBy")
+	private List<OrderByTicketEntity> listOrderByTicket = new ArrayList<>();
+	
 }

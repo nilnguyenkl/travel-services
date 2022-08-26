@@ -38,7 +38,7 @@ public class CustomUserDetails implements UserDetails {
 	}
 
 	public static CustomUserDetails build(UserEntity user) {
-		RoleEntity role = user.getRole();
+		RoleEntity role = user.getRoleUser();
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(role.getRole()));
 

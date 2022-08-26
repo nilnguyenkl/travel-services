@@ -1,20 +1,14 @@
 package example.api;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import example.entity.RefreshTokenEntity;
 import example.entity.UserEntity;
 import example.exception.TokenRefreshException;
-import example.exception.UserNotFoundException;
 import example.payload.request.ForgotPasswordRequest;
 import example.payload.request.LoginRequest;
 import example.payload.request.RegisterRequest;
+import example.payload.request.ResetPasswordRequest;
 import example.payload.request.TokenRefreshRequest;
 import example.payload.response.ForgotPasswordResponse;
 import example.payload.response.LoginResponse;
@@ -94,9 +88,23 @@ public class AuthAPI {
 	    return new ForgotPasswordResponse(token);
     }
 	
-//	@PostMapping("/reset_password")
-//    public String resetPassword() {
-// 
-//    }
+	@PostMapping("/auth/resetpassword")
+	public String resetPassword(@RequestBody ResetPasswordRequest request) {
+		UserEntity user = userService.getByResetPasswordToken(request.getToken());
+		if (user == null) {
+			return "failed";
+		} else {
+			userService.updatePassword(user, request.getNewPassword());
+			return "Success";
+		}
+	}
+	
+	@GetMapping("/auth/test")
+	public String test(@RequestBody String request) {
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+//		String currentPrincipalName = userDetails.getEmail();
+		return "123";
+	}
 
 }

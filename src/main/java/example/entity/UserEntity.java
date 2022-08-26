@@ -16,35 +16,52 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 public class UserEntity {
+	
 	@Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
+	
 	@Column
     private String username;
+	
 	@Column
 	private String password;
+	
 	@Column
 	private String firstname;
+	
 	@Column
 	private String lastname;
+	
 	@Column
 	private String phone;
+	
 	@Column
 	private String email;
+	
+	@Column
+	private String sex;
+	
 	@Column
 	private String avatar;
-	@Column(name = "reset_password_token")
+	
+	@Column(name = "resetPasswordToken")
     private String resetPasswordToken;
 	
 	@ManyToOne
-	@JoinColumn(name = "role_id", foreignKey = @ForeignKey(name = "role_id_fk"))
-    private RoleEntity role;
+	@JoinColumn(name = "role_id", foreignKey = @ForeignKey(name = "role_id_fk_user"))
+    private RoleEntity roleUser;
 	
+	@OneToMany(mappedBy = "userService")
+	private List<ServiceEntity> listService = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "user")
-	private List<CommentEntity> lcomment = new ArrayList<>();
+	@OneToMany(mappedBy = "userReview")
+	private List<ReviewEntity> listReview = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "userOrder")
+	private List<OrderEntity> listOrder = new ArrayList<>();
 
 	public long getId() {
 		return id;
@@ -102,20 +119,20 @@ public class UserEntity {
 		this.email = email;
 	}
 
-	public RoleEntity getRole() {
-		return role;
+	public RoleEntity getRoleUser() {
+		return roleUser;
 	}
 
-	public void setRole(RoleEntity role) {
-		this.role = role;
+	public void setRoleUser(RoleEntity roleUser) {
+		this.roleUser = roleUser;
 	}
 
-	public List<CommentEntity> getLcomment() {
-		return lcomment;
+	public List<ReviewEntity> getListReview() {
+		return listReview;
 	}
 
-	public void setLcomment(List<CommentEntity> lcomment) {
-		this.lcomment = lcomment;
+	public void setListReview(List<ReviewEntity> listReview) {
+		this.listReview = listReview;
 	}
 
 	public String getAvatar() {
@@ -133,4 +150,21 @@ public class UserEntity {
 	public void setResetPasswordToken(String resetPasswordToken) {
 		this.resetPasswordToken = resetPasswordToken;
 	}
+
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	public List<ServiceEntity> getListService() {
+		return listService;
+	}
+
+	public void setListService(List<ServiceEntity> listService) {
+		this.listService = listService;
+	}
+	
 }
