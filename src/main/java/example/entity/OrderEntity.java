@@ -31,10 +31,7 @@ public class OrderEntity {
 	private List<OrderItemEntity> listOrderItem = new ArrayList<>();
 	
 	@Column
-	private String firstname;
-	
-	@Column
-	private String lastname;
+	private String fullname;
 	
 	@Column
 	private String phone;
@@ -43,21 +40,94 @@ public class OrderEntity {
 	private String email;
 	
 	@Column
-	private String note;
-	
-	@Column
 	private int total;
 	
-	// 3 trạng thái : chuẩn bị booking, booking, xác nhận booking
 	@Column
-	private String status;
+	private boolean orderStatus;
 	
 	@Column
 	private Date createDate;
 	
 	@Column
 	private Date modifiedDate;
-	
-	//alter table order add constraint user_id_fk_orrder foreign key (user_id) references user (id)
-	
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public UserEntity getUserOrder() {
+		return userOrder;
+	}
+
+	public void setUserOrder(UserEntity userOrder) {
+		this.userOrder = userOrder;
+	}
+
+	public List<OrderItemEntity> getListOrderItem() {
+		return listOrderItem;
+	}
+
+	public void setListOrderItem(List<OrderItemEntity> listOrderItem) {
+		this.listOrderItem = listOrderItem;
+	}
+
+	public String getFullname() {
+		return fullname;
+	}
+
+	public void setFullname(String fullname) {
+		this.fullname = fullname;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public int getTotal() {
+		return total;
+	}
+
+	public void setTotal(int total) {
+		this.total = total;
+	}
+
+	public boolean isOrderStatus() {
+		return orderStatus;
+	}
+
+	public void setOrderStatus(boolean orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
 }

@@ -21,6 +21,9 @@ public class AreaEntity {
 	@Column
 	private String name;
 	
+	@Column
+	private String dataUrl;
+	
 	@OneToMany(mappedBy = "areaService")
 	private List<ServiceEntity> listService = new ArrayList<>();
 	

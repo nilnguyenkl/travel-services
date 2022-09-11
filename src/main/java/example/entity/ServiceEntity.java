@@ -64,12 +64,142 @@ public class ServiceEntity {
     private UserEntity userService;
 	
 	@OneToMany(mappedBy = "serviceStorage")
-	private List<StorageEntity> listStorage = new ArrayList<>();
+	private List<LinkDataEntity> listStorage = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "serviceReview")
 	private List<ReviewEntity> listReview = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "serviceTicket")
 	private List<TicketEntity> listTicket = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getEvent() {
+		return event;
+	}
+
+	public void setEvent(String event) {
+		this.event = event;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+
+	public CategoryEntity getCategoryService() {
+		return categoryService;
+	}
+
+	public void setCategoryService(CategoryEntity categoryService) {
+		this.categoryService = categoryService;
+	}
+
+	public AreaEntity getAreaService() {
+		return areaService;
+	}
+
+	public void setAreaService(AreaEntity areaService) {
+		this.areaService = areaService;
+	}
+
+	public List<OrderItemEntity> getListOrderItem() {
+		return listOrderItem;
+	}
+
+	public void setListOrderItem(List<OrderItemEntity> listOrderItem) {
+		this.listOrderItem = listOrderItem;
+	}
+
+	public UserEntity getUserService() {
+		return userService;
+	}
+
+	public void setUserService(UserEntity userService) {
+		this.userService = userService;
+	}
+
+	public List<LinkDataEntity> getListStorage() {
+		return listStorage;
+	}
+
+	public void setListStorage(List<LinkDataEntity> listStorage) {
+		this.listStorage = listStorage;
+	}
+
+	public List<ReviewEntity> getListReview() {
+		return listReview;
+	}
+
+	public void setListReview(List<ReviewEntity> listReview) {
+		this.listReview = listReview;
+	}
+
+	public List<TicketEntity> getListTicket() {
+		return listTicket;
+	}
+
+	public void setListTicket(List<TicketEntity> listTicket) {
+		this.listTicket = listTicket;
+	}
+	
+	
 	
 }

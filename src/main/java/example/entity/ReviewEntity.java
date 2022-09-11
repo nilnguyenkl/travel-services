@@ -38,6 +38,46 @@ public class ReviewEntity {
 	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "user_id_fk_review"))
     private UserEntity userReview;
 	
+	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+
+	public ServiceEntity getServiceReview() {
+		return serviceReview;
+	}
+
+	public void setServiceReview(ServiceEntity serviceReview) {
+		this.serviceReview = serviceReview;
+	}
+
+	public UserEntity getUserReview() {
+		return userReview;
+	}
+
+	public void setUserReview(UserEntity userReview) {
+		this.userReview = userReview;
+	}
 
 	public String getContent() {
 		return content;

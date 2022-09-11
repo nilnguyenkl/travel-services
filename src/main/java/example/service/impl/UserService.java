@@ -7,13 +7,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import example.config.jwt.CustomUserDetails;
 import example.entity.RoleEntity;
 import example.entity.UserEntity;
 import example.exception.UserNotFoundException;
 import example.payload.request.RegisterRequest;
 import example.repository.RoleRepository;
 import example.repository.UserRepository;
-import example.sercurity.jwt.CustomUserDetails;
 import example.service.IUserService;
 
 @Service

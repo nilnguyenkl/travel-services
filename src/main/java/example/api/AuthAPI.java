@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import example.config.jwt.CustomUserDetails;
+import example.config.jwt.JwtTokenProvider;
 import example.entity.RefreshTokenEntity;
 import example.entity.UserEntity;
 import example.exception.TokenRefreshException;
@@ -26,8 +28,6 @@ import example.payload.request.TokenRefreshRequest;
 import example.payload.response.ForgotPasswordResponse;
 import example.payload.response.LoginResponse;
 import example.payload.response.TokenRefreshResponse;
-import example.sercurity.jwt.CustomUserDetails;
-import example.sercurity.jwt.JwtTokenProvider;
 import example.service.IUserService;
 import example.service.impl.RefreshTokenService;
 import net.bytebuddy.utility.RandomString;

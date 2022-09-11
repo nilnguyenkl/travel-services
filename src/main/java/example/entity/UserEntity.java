@@ -2,6 +2,7 @@ package example.entity;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -47,6 +48,12 @@ public class UserEntity {
 	@Column
 	private String avatar;
 	
+	@Column
+	private Date createDate;
+	
+	@Column
+	private Date modifiedDate;
+	
 	@Column(name = "resetPasswordToken")
     private String resetPasswordToken;
 	
@@ -62,6 +69,41 @@ public class UserEntity {
 	
 	@OneToMany(mappedBy = "userOrder")
 	private List<OrderEntity> listOrder = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "userCart")
+	private List<CartEntity> listCart = new ArrayList<>();
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+
+	public List<OrderEntity> getListOrder() {
+		return listOrder;
+	}
+
+	public void setListOrder(List<OrderEntity> listOrder) {
+		this.listOrder = listOrder;
+	}
+
+	public List<CartEntity> getListCart() {
+		return listCart;
+	}
+
+	public void setListCart(List<CartEntity> listCart) {
+		this.listCart = listCart;
+	}
 
 	public long getId() {
 		return id;
