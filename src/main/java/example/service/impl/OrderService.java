@@ -20,6 +20,8 @@ import example.entity.UserEntity;
 import example.payload.request.CartRequest;
 import example.payload.request.InforRequest;
 import example.payload.request.OrderRequest;
+import example.payload.response.OrderItemResponse;
+import example.payload.response.OrderObjectResponse;
 import example.payload.response.OrderResponse;
 import example.payload.response.TicketResponse;
 import example.repository.CartItemByTicketRepository;
@@ -180,4 +182,77 @@ public class OrderService implements IOrderService {
 	}
 
 
+
+	@Override
+	public List<OrderObjectResponse> findAll(org.springframework.data.domain.Pageable pageable) {
+		
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		List<OrderObjectResponse> listOrder = new ArrayList<>();
+		List<OrderEntity> orders = orderRepository.findByUserOrderId(userEntity.getId(), pageable).getContent();
+		
+		for (OrderEntity order : orders) {
+			listOrder.add(convertToOrderObjectResponse(order));
+		}
+		return listOrder;
+	}
+	
+	
+	public int totalItem() {
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		return (int) orderRepository.findAllByUserOrderId(userEntity.getId()).size();
+	}
+
+
+
+	@Override
+	public OrderObjectResponse findOne(Long idOrder) {
+		OrderEntity orderEntity = orderRepository.findOneById(idOrder);
+		return convertToOrderObjectResponse(orderEntity);
+	}
+	
+	public OrderObjectResponse convertToOrderObjectResponse(OrderEntity order) {
+		OrderObjectResponse response = new OrderObjectResponse();
+		
+		InforRequest infor = new InforRequest();
+		response.setIdOrder(order.getId());
+		infor.setEmail(order.getEmail());
+		infor.setFullname(order.getFullname());
+		infor.setPhone(order.getPhone());
+		response.setInfor(infor);
+		response.setCreateDate(order.getCreateDate());
+		response.setTotalOrder(order.getTotal());
+		
+		List<OrderItemResponse> lstItem = new ArrayList<>();
+		
+		for (OrderItemEntity orderItem : orderItemRepository.findAllByOrderOrderItemId(order.getId())) {
+			OrderItemResponse item = new OrderItemResponse();
+			item.setBookingDate(orderItem.getBookingDate());
+			item.setCreateDate(orderItem.getCreateDate());
+			item.setIdService(orderItem.getServiceOrderItem().getId());
+			item.setTotalItem(orderItem.getTotal());
+			List<TicketResponse> tickets = new ArrayList<>(); 
+			for (OrderItemByTicketEntity itembyticket : orderItemByTicketRepository.findAllByOrderItemById(orderItem.getId())) {
+				TicketResponse ticket = new TicketResponse();
+				ticket.setAmountTicket(itembyticket.getAmount());
+				ticket.setIdTicket(itembyticket.getTicketBy().getId());
+				ticket.setNote(ticketRepository.findOneById(itembyticket.getTicketBy().getId()).getNote());
+				ticket.setTypeTicket(itembyticket.getType());
+				ticket.setValueTicket(itembyticket.getCurrentPrice());
+				tickets.add(ticket);
+			}
+			item.setTickets(tickets);
+			lstItem.add(item);	
+		}
+		response.setItems(lstItem);
+		
+		return response;
+	}
 }

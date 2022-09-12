@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import example.entity.TicketEntity;
 import example.entity.UserEntity;
 import example.payload.request.CartRequest;
 import example.payload.response.CartResponse;
+import example.payload.response.GetCartResponse;
 import example.payload.response.TicketResponse;
 import example.repository.CartItemByTicketRepository;
 import example.repository.CartItemRepository;
@@ -163,6 +165,47 @@ public class CartService implements ICartService {
 			return Optional.ofNullable(new CartResponse (cartItemId, request.getIdService(), request.getBookingDate(), convertListTicketResponse(request)));
 		}
 		throw new NullPointerException();
+	}
+
+	@Override
+	public List<CartResponse> findAll(Pageable pageable) {
+		
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		List<CartResponse> response = new ArrayList<>();
+		
+		CartEntity cartEntity = cartRepository.findOneByUserCartId(userEntity.getId());
+		
+		List<CartItemEntity> cartItems = cartItemRepository.findAllByCartCartItemId(cartEntity.getId(), pageable).getContent();
+		
+		for (CartItemEntity cartItem : cartItems) {
+			List<TicketResponse> tickets = new ArrayList<>();
+			for (CartItemByTicketEntity item : cartItemByticketRepository.findAllByCartItemById(cartItem.getId())) {
+				TicketResponse ticket = new TicketResponse();
+				ticket.setAmountTicket(item.getAmount());
+				ticket.setIdTicket(item.getCartTicketBy().getId());
+				ticket.setNote(ticketRepository.findOneById(item.getCartTicketBy().getId()).getNote());
+				ticket.setTypeTicket(ticketRepository.findOneById(item.getCartTicketBy().getId()).getType());
+				ticket.setValueTicket(ticketRepository.findOneById(item.getCartTicketBy().getId()).getValue());
+				tickets.add(ticket);
+			}
+			
+			response.add(new CartResponse(
+					cartItem.getId(), 
+					cartItem.getServiceCartItem().getId(), 
+					cartItem.getBookingDate() == null ? "" : cartItem.getBookingDate().toString(), 
+					tickets
+				)
+			);
+		}
+		return response;
+	}
+	
+	public int totalItem() {
+		return 4;
 	}
 	
 	
