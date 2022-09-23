@@ -1,6 +1,8 @@
 package example.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +15,8 @@ import example.entity.RoleEntity;
 import example.entity.UserEntity;
 import example.exception.UserNotFoundException;
 import example.payload.request.RegisterRequest;
+import example.payload.response.ProfileResponse;
+import example.repository.OrderRepository;
 import example.repository.RoleRepository;
 import example.repository.UserRepository;
 import example.service.IUserService;
@@ -25,6 +29,9 @@ public class UserService implements IUserService, UserDetailsService {
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	@Autowired
+	private OrderRepository orderRepository;
 
 	@Override
 	public String createUser(RegisterRequest request) {
@@ -82,5 +89,36 @@ public class UserService implements IUserService, UserDetailsService {
 	@Override
 	public UserEntity getByResetPasswordToken(String token) {
 		return userRepository.findOneByResetPasswordToken(token);
-	}	
+	}
+
+	@Override
+	public ProfileResponse getProfile() {
+		ProfileResponse response = new ProfileResponse();
+		
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		response.setAvatar(userEntity.getAvatar());
+		response.setEmail(userEntity.getEmail());
+		response.setFirstname(userEntity.getFirstname());
+		response.setLastname(userEntity.getLastname());
+		response.setId(userEntity.getId());
+		response.setPhone(userEntity.getPhone());
+		response.setSex(userEntity.getSex());
+		response.setRole(userEntity.getRoleUser().getRole());
+		
+		return response;
+	}
+	
+	@Override
+	public int totalOrder() {
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		return orderRepository.findAllByUserOrderId(userEntity.getId()).size();
+	}
 }

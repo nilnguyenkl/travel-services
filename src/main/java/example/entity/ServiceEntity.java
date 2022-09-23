@@ -3,8 +3,10 @@ package example.entity;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
@@ -36,7 +38,7 @@ public class ServiceEntity {
 	private String note;
 	
 	@Column(columnDefinition = "TEXT")
-	private String event;
+	private String event; 
 	
 	@Column
 	private Date createDate;
@@ -59,9 +61,13 @@ public class ServiceEntity {
 	@OneToMany(mappedBy = "serviceOrderItem")
 	private List<OrderItemEntity> listOrderItem = new ArrayList<>();
 	
+	@OneToMany(mappedBy = "serviceSchedule")
+	private List<ScheduleEntity> listSchedule = new ArrayList<>();
+	
 	@ManyToOne
 	@JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "user_id_fk_service"))
     private UserEntity userService;
+	
 	
 	@OneToMany(mappedBy = "serviceStorage")
 	private List<LinkDataEntity> listStorage = new ArrayList<>();
@@ -199,7 +205,13 @@ public class ServiceEntity {
 	public void setListTicket(List<TicketEntity> listTicket) {
 		this.listTicket = listTicket;
 	}
-	
-	
-	
+
+	public List<ScheduleEntity> getListSchedule() {
+		return listSchedule;
+	}
+
+	public void setListSchedule(List<ScheduleEntity> listSchedule) {
+		this.listSchedule = listSchedule;
+	}
+		
 }

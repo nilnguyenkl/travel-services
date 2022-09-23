@@ -34,7 +34,10 @@ public class CartItemEntity {
 	private List<CartItemByTicketEntity> listCartByTicket = new ArrayList<>();
 	
 	@Column
-	private Date bookingDate;
+	private String bookDay;
+	
+	@Column
+	private String bookTime;
 	
 	@Column
 	private Date createDate;
@@ -74,12 +77,20 @@ public class CartItemEntity {
 		this.listCartByTicket = listCartByTicket;
 	}
 
-	public Date getBookingDate() {
-		return bookingDate;
+	public String getBookDay() {
+		return bookDay;
 	}
 
-	public void setBookingDate(Date bookingDate) {
-		this.bookingDate = bookingDate;
+	public void setBookDay(String bookDay) {
+		this.bookDay = bookDay;
+	}
+
+	public String getBookTime() {
+		return bookTime;
+	}
+
+	public void setBookTime(String bookTime) {
+		this.bookTime = bookTime;
 	}
 
 	public Date getCreateDate() {

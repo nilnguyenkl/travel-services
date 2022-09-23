@@ -13,4 +13,5 @@ public interface ITicketService {
 	TicketResponse createTicket1(CreateTicketRequest request);
 	TicketResponse modifyTicket(TicketResponse request);
 	List<ESMTicket> convertToESMTicket(Long idService);
+	TicketResponse convertToTicketResponse(TicketEntity entity);
 }

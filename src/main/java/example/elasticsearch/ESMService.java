@@ -31,6 +31,9 @@ public class ESMService {
 	@Field(type = FieldType.Integer)
 	private int reviews;
 	
+	@Field(type = FieldType.Integer)
+	private int orders;
+	
 	@Field(type = FieldType.Date)
 	private Date createDate;
 	
@@ -99,5 +102,13 @@ public class ESMService {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+
+	public int getOrders() {
+		return orders;
+	}
+
+	public void setOrders(int orders) {
+		this.orders = orders;
 	}
 }

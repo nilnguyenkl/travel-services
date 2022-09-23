@@ -1,6 +1,5 @@
 package example.payload.response;
 
-import java.util.Date;
 import java.util.List;
 
 public class CartResponse {
@@ -9,13 +8,16 @@ public class CartResponse {
 	
 	private Long idService;
 	
-	private String bookingDate;
+	private String bookDay;
+	
+	private String bookTime;
 	
 	private List<TicketResponse> tickets;
 	
-	public CartResponse(Long idCartItem, Long idService, String bookingDate, List<TicketResponse> tickets) {
+	public CartResponse(Long idCartItem, Long idService, String bookDay, String bookTime, List<TicketResponse> tickets) {
 		this.idService = idService;
-		this.bookingDate = bookingDate;
+		this.bookDay = bookDay;
+		this.bookTime = bookTime;
 		this.tickets = tickets;
 		this.idCartItem = idCartItem;
 	}
@@ -35,13 +37,21 @@ public class CartResponse {
 	public void setIdService(Long idService) {
 		this.idService = idService;
 	}
-	
-	public String getBookingDate() {
-		return bookingDate;
+
+	public String getBookDay() {
+		return bookDay;
 	}
 
-	public void setBookingDate(String bookingDate) {
-		this.bookingDate = bookingDate;
+	public void setBookDay(String bookDay) {
+		this.bookDay = bookDay;
+	}
+
+	public String getBookTime() {
+		return bookTime;
+	}
+
+	public void setBookTime(String bookTime) {
+		this.bookTime = bookTime;
 	}
 
 	public List<TicketResponse> getTickets() {

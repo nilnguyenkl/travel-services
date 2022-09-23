@@ -3,11 +3,15 @@ package example.payload.response;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
+
 public class OrderItemResponse {
 	
 	private Long idService;
 	
-	private Date bookingDate;
+	private String bookDay;
+	
+	private String bookTime;
 	
 	private Date createDate;
 	
@@ -23,14 +27,22 @@ public class OrderItemResponse {
 		this.idService = idService;
 	}
 	
-	public Date getBookingDate() {
-		return bookingDate;
+	public String getBookDay() {
+		return bookDay;
 	}
-	
-	public void setBookingDate(Date bookingDate) {
-		this.bookingDate = bookingDate;
+
+	public void setBookDay(String bookDay) {
+		this.bookDay = bookDay;
 	}
-	
+
+	public String getBookTime() {
+		return bookTime;
+	}
+
+	public void setBookTime(String bookTime) {
+		this.bookTime = bookTime;
+	}
+
 	public int getTotalItem() {
 		return totalItem;
 	}

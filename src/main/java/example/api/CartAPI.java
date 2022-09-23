@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,10 +50,17 @@ public class CartAPI {
 	}
 	
 	@GetMapping(value = "/cart")
-	public GetCartResponse getCart(@RequestParam("page") int page, @RequestParam("limit") int limit) {
+	public GetCartResponse getCart(@RequestParam("page") int page, @RequestParam("limit") int limit, @RequestParam("sort") String sort) {
 		GetCartResponse result = new GetCartResponse();
 		result.setPage(page);
-		Pageable pageable =  PageRequest.of(page-1,limit);
+		Sort sortable = null;
+		if (sort.equals("ASC")) {
+			sortable = Sort.by("id").ascending();
+		}
+		if (sort.equals("DESC")) {
+			sortable = Sort.by("id").descending();
+		}
+		Pageable pageable =  PageRequest.of(page-1,limit, sortable);
 		result.setData(cartService.findAll(pageable));
 		result.setTotalPage((int)Math.ceil((double)cartService.totalItem() / limit));
 		return result;

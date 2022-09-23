@@ -1,7 +1,5 @@
 package example.service.impl;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -92,12 +90,8 @@ public class OrderService implements IOrderService {
 				OrderItemEntity orderItem = new OrderItemEntity();
 				orderItem.setCreateDate(new Date());
 				orderItem.setModifiedDate(new Date());
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");  
-				try {
-					orderItem.setBookingDate(formatter.parse(request.getItems().get(i).getBookingDate()));
-				} catch (ParseException e) {
-					throw new NullPointerException();
-				}
+				orderItem.setBookDay(request.getItems().get(i).getBookDay());
+				orderItem.setBookTime(request.getItems().get(i).getBookTime());
 				orderItem.setNote(request.getItems().get(i).getNote());
 				orderItem.setOrderOrderItem(rsOrder);
 				orderItem.setTotal(totalOrderItemPrice(request.getItems().get(i).getTickets()));
@@ -129,7 +123,7 @@ public class OrderService implements IOrderService {
 	}
 	
 	
-	
+	@Override
 	public int totalOrderPrice(List<CartRequest> items) {
 		int total = 0;
 		for (CartRequest item : items) {
@@ -138,6 +132,7 @@ public class OrderService implements IOrderService {
 		return total;
 	}
 	
+	@Override
 	public int totalOrderItemPrice(List<TicketResponse> tickets) {
 		int total = 0;
 		for (TicketResponse ticket : tickets) {
@@ -146,7 +141,7 @@ public class OrderService implements IOrderService {
 		return total;
 	}
 
-
+	@Override
 	public InforRequest convertToInforRequest(Long idOrder) {
 		OrderEntity orderEntity = orderRepository.findOneById(idOrder);
 		InforRequest infor = new InforRequest();
@@ -156,11 +151,13 @@ public class OrderService implements IOrderService {
 		return infor;
 	}
 	
+	@Override
 	public List<CartRequest> convertToListCartRequest(List<OrderItemEntity> listOrderItem) {
 		List<CartRequest> listCartRequest = new ArrayList<>();
 		for (int i = 0; i < listOrderItem.size(); i++) {
 			CartRequest cartRequest = new CartRequest();
-			cartRequest.setBookingDate(listOrderItem.get(i).getBookingDate().toString());
+			cartRequest.setBookDay(listOrderItem.get(i).getBookDay());
+			cartRequest.setBookTime(listOrderItem.get(i).getBookTime());
 			cartRequest.setIdService(listOrderItem.get(i).getServiceOrderItem().getId());
 			cartRequest.setNote(listOrderItem.get(i).getNote());
 			List<OrderItemByTicketEntity> orderItemByTickets = orderItemByTicketRepository.findAllByOrderItemById(listOrderItem.get(i).getId());
@@ -192,15 +189,17 @@ public class OrderService implements IOrderService {
 		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
 		
 		List<OrderObjectResponse> listOrder = new ArrayList<>();
-		List<OrderEntity> orders = orderRepository.findByUserOrderId(userEntity.getId(), pageable).getContent();
 		
-		for (OrderEntity order : orders) {
-			listOrder.add(convertToOrderObjectResponse(order));
+		List<OrderEntity> orders = orderRepository.findByUserOrderId(userEntity.getId(), pageable).getContent();
+		if (orders != null) {
+			for (OrderEntity order : orders) {
+				listOrder.add(convertToOrderObjectResponse(order));
+			}
 		}
 		return listOrder;
 	}
 	
-	
+	@Override
 	public int totalItem() {
 		// Authentication
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -218,6 +217,7 @@ public class OrderService implements IOrderService {
 		return convertToOrderObjectResponse(orderEntity);
 	}
 	
+	@Override
 	public OrderObjectResponse convertToOrderObjectResponse(OrderEntity order) {
 		OrderObjectResponse response = new OrderObjectResponse();
 		
@@ -234,7 +234,8 @@ public class OrderService implements IOrderService {
 		
 		for (OrderItemEntity orderItem : orderItemRepository.findAllByOrderOrderItemId(order.getId())) {
 			OrderItemResponse item = new OrderItemResponse();
-			item.setBookingDate(orderItem.getBookingDate());
+			item.setBookDay(orderItem.getBookDay());
+			item.setBookTime(orderItem.getBookTime());
 			item.setCreateDate(orderItem.getCreateDate());
 			item.setIdService(orderItem.getServiceOrderItem().getId());
 			item.setTotalItem(orderItem.getTotal());

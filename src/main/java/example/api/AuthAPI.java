@@ -98,13 +98,5 @@ public class AuthAPI {
 			return "Success";
 		}
 	}
-	
-	@GetMapping("/auth/test")
-	public String test(@RequestBody String request) {
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//		String currentPrincipalName = userDetails.getEmail();
-		return "123";
-	}
 
 }

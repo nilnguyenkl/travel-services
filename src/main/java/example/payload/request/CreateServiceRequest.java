@@ -12,6 +12,8 @@ public class CreateServiceRequest {
 	
 	private List<LinkDataResponse> galleries;
 	
+	private List<ScheduleRequest> schedule;
+	
 	public ServiceRequest getService() {
 		return service;
 	}
@@ -29,5 +31,11 @@ public class CreateServiceRequest {
 	}
 	public void setGalleries(List<LinkDataResponse> galleries) {
 		this.galleries = galleries;
+	}
+	public List<ScheduleRequest> getSchedule() {
+		return schedule;
+	}
+	public void setSchedule(List<ScheduleRequest> schedule) {
+		this.schedule = schedule;
 	}
 }

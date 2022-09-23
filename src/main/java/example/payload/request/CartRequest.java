@@ -7,7 +7,9 @@ public class CartRequest {
 	
 	private Long idService;
 	
-	private String bookingDate;
+	private String bookDay;
+	
+	private String bookTime;
 	
 	private String note;
 	
@@ -23,12 +25,20 @@ public class CartRequest {
 		this.idService = idService;
 	}
 
-	public String getBookingDate() {
-		return bookingDate;
+	public String getBookDay() {
+		return bookDay;
 	}
 
-	public void setBookingDate(String bookingDate) {
-		this.bookingDate = bookingDate;
+	public void setBookDay(String bookDay) {
+		this.bookDay = bookDay;
+	}
+
+	public String getBookTime() {
+		return bookTime;
+	}
+
+	public void setBookTime(String bookTime) {
+		this.bookTime = bookTime;
 	}
 
 	public List<TicketResponse> getTickets() {

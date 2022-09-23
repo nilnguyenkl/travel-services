@@ -1,7 +1,5 @@
 package example.service.impl;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +19,6 @@ import example.entity.TicketEntity;
 import example.entity.UserEntity;
 import example.payload.request.CartRequest;
 import example.payload.response.CartResponse;
-import example.payload.response.GetCartResponse;
 import example.payload.response.TicketResponse;
 import example.repository.CartItemByTicketRepository;
 import example.repository.CartItemRepository;
@@ -75,14 +72,11 @@ public class CartService implements ICartService {
 		}
 	}
 	
+	@Override
 	public Optional<CartResponse> saveCartItemAndTicket(CartEntity cartEntity, CartRequest request) {
-		CartItemEntity cartItem = new CartItemEntity();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");  
-		try {
-			cartItem.setBookingDate(formatter.parse(request.getBookingDate()));
-		} catch (ParseException e) {
-			throw new NullPointerException();
-		}
+		CartItemEntity cartItem = new CartItemEntity(); 
+		cartItem.setBookDay(request.getBookDay());
+		cartItem.setBookTime(request.getBookTime());
 		cartItem.setCreateDate(new Date());
 		cartItem.setModifiedDate(new Date());
 		cartItem.setCartCartItem(cartEntity);
@@ -96,11 +90,12 @@ public class CartService implements ICartService {
 				cartItemByTicket.setCartTicketBy(ticketRepository.findOneById(ticket.getIdTicket()));
 				cartItemByticketRepository.save(cartItemByTicket);
 			}
-			return Optional.ofNullable(new CartResponse (rsCartItem.getId(), request.getIdService(), request.getBookingDate(), convertListTicketResponse(request)));
+			return Optional.ofNullable(new CartResponse (rsCartItem.getId(), request.getIdService(), request.getBookDay(), request.getBookTime(), convertListTicketResponse(request)));
 		}
 		throw new NullPointerException();
 	}
 	
+	@Override
 	public List<TicketResponse> convertListTicketResponse(CartRequest cartRequest) {
 		List<TicketResponse> listTicket = new ArrayList<>();
 		for (int i = 0; i < cartRequest.getTickets().size(); i++) {
@@ -132,12 +127,8 @@ public class CartService implements ICartService {
 	@Override
 	public Optional<CartResponse> updateCart(CartRequest request, Long cartItemId) {
 		CartItemEntity cartItemEntity = cartItemRepository.findOneById(cartItemId);
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");  
-		try {
-			cartItemEntity.setBookingDate(formatter.parse(request.getBookingDate()));
-		} catch (ParseException e) {
-			throw new NullPointerException();
-		}
+		cartItemEntity.setBookDay(request.getBookDay());
+		cartItemEntity.setBookTime(request.getBookTime());
 		cartItemEntity.setModifiedDate(new Date());
 		CartItemEntity cartItem = cartItemRepository.save(cartItemEntity);
 		
@@ -162,7 +153,7 @@ public class CartService implements ICartService {
 			List<CartItemByTicketEntity> cartItemByTicket3 = new ArrayList<>(cartItemByTicket2);
 			cartItemByTicket3.removeAll(cartItemByTicket1);
 			cartItemByticketRepository.deleteAll(cartItemByTicket3);
-			return Optional.ofNullable(new CartResponse (cartItemId, request.getIdService(), request.getBookingDate(), convertListTicketResponse(request)));
+			return Optional.ofNullable(new CartResponse (cartItemId, request.getIdService(), request.getBookDay(), request.getBookTime(), convertListTicketResponse(request)));
 		}
 		throw new NullPointerException();
 	}
@@ -179,33 +170,48 @@ public class CartService implements ICartService {
 		
 		CartEntity cartEntity = cartRepository.findOneByUserCartId(userEntity.getId());
 		
-		List<CartItemEntity> cartItems = cartItemRepository.findAllByCartCartItemId(cartEntity.getId(), pageable).getContent();
-		
-		for (CartItemEntity cartItem : cartItems) {
-			List<TicketResponse> tickets = new ArrayList<>();
-			for (CartItemByTicketEntity item : cartItemByticketRepository.findAllByCartItemById(cartItem.getId())) {
-				TicketResponse ticket = new TicketResponse();
-				ticket.setAmountTicket(item.getAmount());
-				ticket.setIdTicket(item.getCartTicketBy().getId());
-				ticket.setNote(ticketRepository.findOneById(item.getCartTicketBy().getId()).getNote());
-				ticket.setTypeTicket(ticketRepository.findOneById(item.getCartTicketBy().getId()).getType());
-				ticket.setValueTicket(ticketRepository.findOneById(item.getCartTicketBy().getId()).getValue());
-				tickets.add(ticket);
-			}
+		if (cartEntity == null) {
+			CartEntity cart = new CartEntity();
+			cart.setUserCart(userEntity);
+			cart.setCreateDate(new Date());
+			cart.setModifiedDate(new Date());
+			cartRepository.save(cart);
+			return response;
+		} else {
 			
-			response.add(new CartResponse(
-					cartItem.getId(), 
-					cartItem.getServiceCartItem().getId(), 
-					cartItem.getBookingDate() == null ? "" : cartItem.getBookingDate().toString(), 
-					tickets
-				)
-			);
+			List<CartItemEntity> cartItems = cartItemRepository.findAllByCartCartItemId(cartEntity.getId(), pageable).getContent();
+			
+			for (CartItemEntity cartItem : cartItems) {
+				List<TicketResponse> tickets = new ArrayList<>();
+				for (CartItemByTicketEntity item : cartItemByticketRepository.findAllByCartItemById(cartItem.getId())) {
+					TicketResponse ticket = new TicketResponse();
+					ticket.setAmountTicket(item.getAmount());
+					ticket.setIdTicket(item.getCartTicketBy().getId());
+					ticket.setNote(ticketRepository.findOneById(item.getCartTicketBy().getId()).getNote());
+					ticket.setTypeTicket(ticketRepository.findOneById(item.getCartTicketBy().getId()).getType());
+					ticket.setValueTicket(ticketRepository.findOneById(item.getCartTicketBy().getId()).getValue());
+					tickets.add(ticket);
+				}
+				
+				response.add(new CartResponse(
+						cartItem.getId(), 
+						cartItem.getServiceCartItem().getId(), 
+						cartItem.getBookDay(),
+						cartItem.getBookTime(),
+						tickets
+					)
+				);
+			}
+			return response;
 		}
-		return response;
 	}
 	
+	@Override
 	public int totalItem() {
-		return 4;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		return cartItemRepository.findAllByCartCartItemId(cartRepository.findOneByUserCartId(userEntity.getId()).getId()).size();
 	}
 	
 	

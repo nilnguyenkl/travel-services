@@ -29,14 +29,17 @@ import example.exception.ServiceException;
 import example.payload.request.CreateServiceRequest;
 import example.payload.request.LinkDataRequest;
 import example.payload.request.ModifyServiceRequest;
+import example.payload.request.ScheduleRequest;
 import example.payload.request.TicketRequest;
 import example.payload.response.LinkDataResponse;
 import example.payload.response.MessageResponse;
+import example.payload.response.ScheduleResponse;
 import example.payload.response.TicketResponse;
 import example.repository.ESServiceRepository;
 import example.repository.LinkDataRepository;
 import example.service.impl.ESService;
 import example.service.impl.LinkDataService;
+import example.service.impl.ScheduleService;
 import example.service.impl.ServiceService;
 import example.service.impl.TicketService;
 
@@ -52,6 +55,9 @@ public class ServiceAPI {
 
 	@Autowired
 	TicketService ticketService;
+	
+	@Autowired
+	ScheduleService scheduleService;
 	
 	@Autowired
 	LinkDataService linkDataService;
@@ -71,7 +77,6 @@ public class ServiceAPI {
 		Arrays.asList(files).stream().forEach(file -> {
 			try {
 				Map upload = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
-				System.out.println(upload.toString());
 				LinkDataResponse link = linkDataService.saveLink(new LinkDataRequest(upload.get("secure_url").toString(), upload.get("resource_type").toString(), upload.get("public_id").toString()));
 				listLink.add(link);
 			} catch (IOException e) {
@@ -103,8 +108,10 @@ public class ServiceAPI {
 		ServiceEntity serviceEntity = serviceService.createService(request.getService()).orElse(null);
 		if (serviceEntity != null) {
 			List<String> listImgUrl = new ArrayList<>();
-			for (TicketRequest ticketRequest : request.getTicket()) {
-				ticketService.createTicket2(ticketRequest, serviceEntity.getId());
+			if (request.getTicket() != null) {
+				for (TicketRequest ticketRequest : request.getTicket()) {
+					ticketService.createTicket2(ticketRequest, serviceEntity.getId());
+				}
 			}
 			for (LinkDataResponse linkRequest : request.getGalleries()) {
 				linkDataService.modifyLink(linkRequest, serviceEntity.getId());
@@ -112,6 +119,12 @@ public class ServiceAPI {
 					listImgUrl.add(linkRequest.getUrl());
 				}
 			}
+			if (request.getSchedule() != null) {
+				for (ScheduleRequest scheduleRequest : request.getSchedule()) {
+					scheduleService.createSchedule2(scheduleRequest, serviceEntity.getId());
+				}
+			}
+			
 			// Add elastich search
 			ESMService esmService = new ESMService();
 			esmService.setId(serviceEntity.getId());
@@ -120,6 +133,7 @@ public class ServiceAPI {
 			esmService.setImage(listImgUrl.get(0));
 			esmService.setTicket(ticketService.convertToESMTicket(serviceEntity.getId()));
 			esmService.setReviews(0);
+			esmService.setOrders(0);
 			esmService.setCreateDate(serviceEntity.getCreateDate());
 			esmService.setModifiedDate(serviceEntity.getModifiedDate());
 			esService.addServiceIntoElastic(esmService);
@@ -133,12 +147,22 @@ public class ServiceAPI {
 	public ResponseEntity<?> modifyProduct(@PathVariable("idService") String id, @RequestBody ModifyServiceRequest request) {
 		ServiceEntity serviceEntity = serviceService.modifyService(request.getService(), Long.parseLong(id)).orElse(null);
 		if (serviceEntity != null) {
-			for (TicketResponse ticketRequest : request.getTicket()) {
-				ticketService.modifyTicket(ticketRequest);
+			if (request.getTicket() != null) {
+				for (TicketResponse ticketRequest : request.getTicket()) {
+					ticketService.modifyTicket(ticketRequest);
+				}
 			}
-			for (LinkDataResponse linkRequest : request.getGalleries()) {
-				linkDataService.modifyLink(linkRequest, serviceEntity.getId());
+			if (request.getGalleries() != null) {
+				for (LinkDataResponse linkRequest : request.getGalleries()) {
+					linkDataService.modifyLink(linkRequest, serviceEntity.getId());
+				}
 			}
+			if (request.getSchedule() != null) {
+				for (ScheduleResponse scheduleRequest : request.getSchedule()) {
+					scheduleService.modifySchedule(scheduleRequest);
+				}
+			}
+			
 			ESMService esmService = esServiceRepository.findOneById(Long.parseLong(id));
 			esmService.setName(serviceEntity.getName());
 			esmService.setDescription(serviceEntity.getDescription());
