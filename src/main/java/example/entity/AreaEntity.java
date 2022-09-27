@@ -26,5 +26,37 @@ public class AreaEntity {
 	
 	@OneToMany(mappedBy = "areaService")
 	private List<ServiceEntity> listService = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDataUrl() {
+		return dataUrl;
+	}
+
+	public void setDataUrl(String dataUrl) {
+		this.dataUrl = dataUrl;
+	}
+
+	public List<ServiceEntity> getListService() {
+		return listService;
+	}
+
+	public void setListService(List<ServiceEntity> listService) {
+		this.listService = listService;
+	}
 	
 }

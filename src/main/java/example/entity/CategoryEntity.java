@@ -23,4 +23,29 @@ public class CategoryEntity {
 	
 	@OneToMany(mappedBy = "categoryService")
 	private List<ServiceEntity> listService = new ArrayList<>();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<ServiceEntity> getListService() {
+		return listService;
+	}
+
+	public void setListService(List<ServiceEntity> listService) {
+		this.listService = listService;
+	}
+	
 }

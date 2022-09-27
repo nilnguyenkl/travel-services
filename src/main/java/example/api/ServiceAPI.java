@@ -134,6 +134,8 @@ public class ServiceAPI {
 			esmService.setTicket(ticketService.convertToESMTicket(serviceEntity.getId()));
 			esmService.setReviews(0);
 			esmService.setOrders(0);
+			esmService.setIdCategory(serviceEntity.getCategoryService().getId());
+			esmService.setIdArea(serviceEntity.getAreaService().getId());
 			esmService.setCreateDate(serviceEntity.getCreateDate());
 			esmService.setModifiedDate(serviceEntity.getModifiedDate());
 			esService.addServiceIntoElastic(esmService);

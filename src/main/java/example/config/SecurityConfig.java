@@ -68,6 +68,7 @@ public class SecurityConfig {
 				.antMatchers("/auth/forgotpassword").permitAll()
 				.antMatchers("/auth/resetpassword").permitAll()
 				.antMatchers("/auth/login").permitAll()
+				.antMatchers("/public/service").permitAll()
 				.anyRequest().authenticated();
 
 		return http.build();

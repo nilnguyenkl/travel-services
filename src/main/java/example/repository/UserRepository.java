@@ -5,6 +5,7 @@ import example.entity.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
 	UserEntity findOneByUsername(String username);
+	UserEntity findOneByPhone(String phone);
 	UserEntity findOneByEmail(String email);
 	UserEntity findOneByResetPasswordToken(String token);
 }

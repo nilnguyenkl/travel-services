@@ -1,49 +1,34 @@
-package example.elasticsearch;
+package example.elasticsearch.model;
 
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Id;
-
-import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName = "service")
-public class ESMService {
-	
-	@Id
-	@Field(type = FieldType.Keyword)
+import example.elasticsearch.ESMTicket;
+
+public class ServiceModel {
 	private Long id;
 	
-	@Field(type = FieldType.Text)
 	private String name;
 	
-	@Field(type = FieldType.Text)
 	private String description;
 	
-	@Field(type = FieldType.Long)
-	private Long idCategory;
-	
-	@Field(type = FieldType.Long)
-	private Long idArea;
-	
-	@Field(type = FieldType.Text)
 	private String image;
 	
-	@Field(type = FieldType.Nested, includeInParent = true)
+	private Long idCategory;
+	
+	private Long idArea;
+	
 	private List<ESMTicket> ticket;
 	
-	@Field(type = FieldType.Integer)
 	private int reviews;
 	
-	@Field(type = FieldType.Integer)
 	private int orders;
 	
-	@Field(type = FieldType.Date)
 	private Date createDate;
-	
-	@Field(type = FieldType.Date)
+
 	private Date modifiedDate;
 
 	public Long getId() {
@@ -94,6 +79,14 @@ public class ESMService {
 		this.reviews = reviews;
 	}
 
+	public int getOrders() {
+		return orders;
+	}
+
+	public void setOrders(int orders) {
+		this.orders = orders;
+	}
+
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -108,14 +101,6 @@ public class ESMService {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
-	}
-
-	public int getOrders() {
-		return orders;
-	}
-
-	public void setOrders(int orders) {
-		this.orders = orders;
 	}
 
 	public Long getIdCategory() {
@@ -133,4 +118,5 @@ public class ESMService {
 	public void setIdArea(Long idArea) {
 		this.idArea = idArea;
 	}
+	
 }

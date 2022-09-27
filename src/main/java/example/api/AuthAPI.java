@@ -10,7 +10,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +26,7 @@ import example.payload.request.ResetPasswordRequest;
 import example.payload.request.TokenRefreshRequest;
 import example.payload.response.ForgotPasswordResponse;
 import example.payload.response.LoginResponse;
+import example.payload.response.MessageResponse;
 import example.payload.response.TokenRefreshResponse;
 import example.service.IUserService;
 import example.service.impl.RefreshTokenService;
@@ -49,8 +49,8 @@ public class AuthAPI {
 	AuthenticationManager authenticationManager;
 
 	@PostMapping(value = "/auth/register")
-	public String createUser(@RequestBody RegisterRequest model) {
-		return userService.createUser(model);
+	public MessageResponse createUser(@RequestBody RegisterRequest model) {
+		return new MessageResponse(userService.createUser(model));
 	}
 
 	@PostMapping("/auth/login")

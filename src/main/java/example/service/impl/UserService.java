@@ -46,6 +46,7 @@ public class UserService implements IUserService, UserDetailsService {
 			entity.setFirstname(request.getFirstname());
 			entity.setLastname(request.getLastname());
 			entity.setPassword(request.getPassword());
+			entity.setSex(request.getSex());
 			entity.setPhone(request.getPhone());
 			entity.setRoleUser(roleEntity);
 			entity.setPassword(new BCryptPasswordEncoder().encode(entity.getPassword()));

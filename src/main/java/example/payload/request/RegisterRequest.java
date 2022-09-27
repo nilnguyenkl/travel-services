@@ -6,6 +6,7 @@ public class RegisterRequest {
 	private String password;
 	private String firstname;
 	private String lastname;
+	private String sex;
 	private String phone;
 	private String email;
 	private Long idRole;
@@ -51,5 +52,11 @@ public class RegisterRequest {
 	}
 	public void setIdRole(Long idRole) {
 		this.idRole = idRole;
+	}
+	public String getSex() {
+		return sex;
+	}
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
 }
