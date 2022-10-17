@@ -35,8 +35,12 @@ import example.payload.response.LinkDataResponse;
 import example.payload.response.MessageResponse;
 import example.payload.response.ScheduleResponse;
 import example.payload.response.TicketResponse;
+import example.repository.AreaRepository;
+import example.repository.CategoryRepository;
 import example.repository.ESServiceRepository;
 import example.repository.LinkDataRepository;
+import example.service.impl.AreaService;
+import example.service.impl.CategoryService;
 import example.service.impl.ESService;
 import example.service.impl.LinkDataService;
 import example.service.impl.ScheduleService;
@@ -57,6 +61,12 @@ public class ServiceAPI {
 	TicketService ticketService;
 	
 	@Autowired
+	AreaService areaService;
+	
+	@Autowired
+	CategoryService categoryService;
+	
+	@Autowired
 	ScheduleService scheduleService;
 	
 	@Autowired
@@ -64,6 +74,12 @@ public class ServiceAPI {
 	
 	@Autowired
 	LinkDataRepository linkDataRepository; 
+	
+	@Autowired
+	AreaRepository areaRepository; 
+	
+	@Autowired
+	CategoryRepository categoryRepository; 
 
 	@Autowired
 	Cloudinary cloudinary;
@@ -87,7 +103,7 @@ public class ServiceAPI {
 	}
 	
 	@DeleteMapping(value = "/admin/delete/{idLink}")
-	public ResponseEntity<?> deleteData(@PathVariable("idLink") String id,@RequestParam String publicId) {
+	public ResponseEntity<?> deleteData(@PathVariable("idLink") String id, @RequestParam String publicId) {
 		LinkDataEntity linkDataEntity = linkDataRepository.findOneById(Long.parseLong(id));
 		try {
 			if (linkDataEntity.getType().equals("image")) {
@@ -134,10 +150,12 @@ public class ServiceAPI {
 			esmService.setTicket(ticketService.convertToESMTicket(serviceEntity.getId()));
 			esmService.setReviews(0);
 			esmService.setOrders(0);
-			esmService.setIdCategory(serviceEntity.getCategoryService().getId());
-			esmService.setIdArea(serviceEntity.getAreaService().getId());
+			esmService.setArea(areaService.convertToESMArea(areaRepository.findOneById(serviceEntity.getAreaService().getId())));
+			esmService.setCategory(categoryService.convertToESMCategory(categoryRepository.findOneById(serviceEntity.getCategoryService().getId())));
 			esmService.setCreateDate(serviceEntity.getCreateDate());
 			esmService.setModifiedDate(serviceEntity.getModifiedDate());
+			esmService.setSchedule(scheduleService.convertToESMSchedule(serviceEntity.getId()));
+			esmService.setAddress(serviceEntity.getAddress());
 			esService.addServiceIntoElastic(esmService);
 			return ResponseEntity.ok(new MessageResponse("Success"));
 		}
@@ -170,6 +188,7 @@ public class ServiceAPI {
 			esmService.setDescription(serviceEntity.getDescription());
 			esmService.setImage(linkDataService.getFirstImage(Long.parseLong(id)));
 			esmService.setTicket(ticketService.convertToESMTicket(serviceEntity.getId()));
+			esmService.setSchedule(scheduleService.convertToESMSchedule(serviceEntity.getId()));
 			esmService.setModifiedDate(serviceEntity.getModifiedDate());
 			esService.modifyServiceElastic(esmService);
 			// Update elasticsearch

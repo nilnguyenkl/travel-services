@@ -46,6 +46,9 @@ public class OrderItemEntity {
 	@Column
 	private String bookTime;
 	
+	@Column
+	private String status;
+	
 	
 	@Column
 	private Date createDate;
@@ -132,4 +135,13 @@ public class OrderItemEntity {
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
 	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
 }

@@ -3,9 +3,8 @@ package example.elasticsearch.model;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-
+import example.elasticsearch.ESMArea;
+import example.elasticsearch.ESMCategory;
 import example.elasticsearch.ESMTicket;
 
 public class ServiceModel {
@@ -17,9 +16,9 @@ public class ServiceModel {
 	
 	private String image;
 	
-	private Long idCategory;
+	private ESMCategory category;
 	
-	private Long idArea;
+	private ESMArea area;
 	
 	private List<ESMTicket> ticket;
 	
@@ -103,20 +102,19 @@ public class ServiceModel {
 		this.modifiedDate = modifiedDate;
 	}
 
-	public Long getIdCategory() {
-		return idCategory;
+	public ESMCategory getCategory() {
+		return category;
 	}
 
-	public void setIdCategory(Long idCategory) {
-		this.idCategory = idCategory;
+	public void setCategory(ESMCategory category) {
+		this.category = category;
 	}
 
-	public Long getIdArea() {
-		return idArea;
+	public ESMArea getArea() {
+		return area;
 	}
 
-	public void setIdArea(Long idArea) {
-		this.idArea = idArea;
-	}
-	
+	public void setArea(ESMArea area) {
+		this.area = area;
+	}	
 }

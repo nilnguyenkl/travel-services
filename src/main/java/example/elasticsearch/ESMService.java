@@ -22,17 +22,23 @@ public class ESMService {
 	@Field(type = FieldType.Text)
 	private String description;
 	
-	@Field(type = FieldType.Long)
-	private Long idCategory;
+	@Field(type = FieldType.Text)
+	private String address;
 	
-	@Field(type = FieldType.Long)
-	private Long idArea;
+	@Field(type = FieldType.Nested, includeInParent = true)
+	private ESMCategory category;
+	
+	@Field(type = FieldType.Nested, includeInParent = true)
+	private ESMArea area;
 	
 	@Field(type = FieldType.Text)
 	private String image;
 	
 	@Field(type = FieldType.Nested, includeInParent = true)
 	private List<ESMTicket> ticket;
+	
+	@Field(type = FieldType.Nested, includeInParent = true)
+	private List<ESMSchedule> schedule;
 	
 	@Field(type = FieldType.Integer)
 	private int reviews;
@@ -118,19 +124,35 @@ public class ESMService {
 		this.orders = orders;
 	}
 
-	public Long getIdCategory() {
-		return idCategory;
+	public ESMCategory getCategory() {
+		return category;
 	}
 
-	public void setIdCategory(Long idCategory) {
-		this.idCategory = idCategory;
+	public void setCategory(ESMCategory category) {
+		this.category = category;
 	}
 
-	public Long getIdArea() {
-		return idArea;
+	public ESMArea getArea() {
+		return area;
 	}
 
-	public void setIdArea(Long idArea) {
-		this.idArea = idArea;
+	public void setArea(ESMArea area) {
+		this.area = area;
+	}
+
+	public List<ESMSchedule> getSchedule() {
+		return schedule;
+	}
+
+	public void setSchedule(List<ESMSchedule> schedule) {
+		this.schedule = schedule;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }

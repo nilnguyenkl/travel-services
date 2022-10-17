@@ -25,6 +25,9 @@ public class ReviewEntity {
 	private String content;
 	
 	@Column
+	private float point;
+	
+	@Column
 	private Date createDate;
 	
 	@Column
@@ -86,5 +89,14 @@ public class ReviewEntity {
 	public void setContent(String content) {
 		this.content = content;
 	}
+
+	public float getPoint() {
+		return point;
+	}
+
+	public void setPoint(float point) {
+		this.point = point;
+	}
+	
 
 }

@@ -1,5 +1,6 @@
 package example.api;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import example.payload.request.OrderRequest;
+import example.payload.response.CalenderOrderResponse;
 import example.payload.response.GetOrderResponse;
 import example.payload.response.OrderObjectResponse;
 import example.payload.response.OrderResponse;
+import example.payload.response.RangeOrderResponse;
 import example.service.impl.OrderService;
 
 @CrossOrigin
@@ -52,5 +55,15 @@ public class OrderAPI {
 	@GetMapping(value = "/order/{idOrder}")
 	public OrderObjectResponse getOrderDetails(@PathVariable("idOrder") int idOrder) {
 		return orderService.findOne((long) idOrder);
+	}
+	
+	@GetMapping(value = "/order/calender")
+	public List<CalenderOrderResponse> calenderEvent() {
+		return orderService.listCalenderOrderByUser();
+	}
+	
+	@GetMapping(value = "/order/range")
+	public RangeOrderResponse rangeOrder(@RequestParam("day") String day, @RequestParam("idService") Long idService) {
+		return orderService.rangeOrder(day, idService);
 	}
 }

@@ -61,6 +61,9 @@ public class ServiceEntity {
 	@OneToMany(mappedBy = "serviceOrderItem")
 	private List<OrderItemEntity> listOrderItem = new ArrayList<>();
 	
+	@OneToMany(mappedBy = "serviceFavorite")
+	private List<FavoriteEntity> listFavorite = new ArrayList<>();
+	
 	@OneToMany(mappedBy = "serviceSchedule")
 	private List<ScheduleEntity> listSchedule = new ArrayList<>();
 	
@@ -212,6 +215,14 @@ public class ServiceEntity {
 
 	public void setListSchedule(List<ScheduleEntity> listSchedule) {
 		this.listSchedule = listSchedule;
+	}
+
+	public List<FavoriteEntity> getListFavorite() {
+		return listFavorite;
+	}
+
+	public void setListFavorite(List<FavoriteEntity> listFavorite) {
+		this.listFavorite = listFavorite;
 	}
 		
 }

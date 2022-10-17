@@ -35,10 +35,28 @@ public class UserService implements IUserService, UserDetailsService {
 
 	@Override
 	public String createUser(RegisterRequest request) {
-		UserEntity user = userRepository.findOneByUsername(request.getUsername());
-		if (user != null) {
+		UserEntity user1 = userRepository.findOneByUsername(request.getUsername());
+		
+		if (user1 != null) {
 			return "Username already exists";
 		} else {
+			
+			if (!request.getEmail().isEmpty()) {
+				UserEntity user2 = userRepository.findOneByEmail(request.getEmail());
+				if (user2 != null) {
+					return "Email already exists";
+				}
+			}
+			
+			if (!request.getPhone().isEmpty()) {
+				UserEntity user3 = userRepository.findOneByPhone(request.getEmail());
+				
+				if (user3 != null) {
+					return "Phone already exists";
+				}
+				
+			}
+			
 			RoleEntity roleEntity = roleRepository.findOneById(request.getIdRole());
 			UserEntity entity = new UserEntity();
 			entity.setUsername(request.getUsername());
@@ -53,6 +71,7 @@ public class UserService implements IUserService, UserDetailsService {
 			// Save to database
 			entity = userRepository.save(entity);
 			return "Success";
+			
 		}
 	}
 	

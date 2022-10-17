@@ -9,4 +9,5 @@ import example.entity.TicketEntity;
 public interface TicketRepository extends JpaRepository<TicketEntity, Long>{
 	List<TicketEntity> findAllByServiceTicketId(Long id);
 	TicketEntity findOneById(Long id);
+	List<TicketEntity> findAllByServiceTicketIdOrderByValueAsc(Long id);
 }

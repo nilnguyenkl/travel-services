@@ -1,8 +1,12 @@
 package example.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import example.elasticsearch.ESMSchedule;
 import example.entity.ScheduleEntity;
 import example.payload.request.ScheduleRequest;
 import example.payload.response.ScheduleResponse;
@@ -43,6 +47,17 @@ public class ScheduleService implements IScheduleService {
 		entity.setQuantityperday(request.getQuantityPerDay());
 		entity.setTime(request.getTime());
 		return convertToScheduleResponse(scheduleRepository.save(entity));
+	}
+
+	@Override
+	public List<ESMSchedule> convertToESMSchedule(Long idService) {
+		List<ScheduleEntity> entities = scheduleRepository.findAllByServiceScheduleId(idService);
+		List<ESMSchedule> list = new ArrayList<>();
+		for (ScheduleEntity entity : entities) {
+			list.add(new ESMSchedule(entity.getId(), entity.getQuantityperday(), entity.getTime()));
+		}
+		
+		return list;
 	}
 
 }

@@ -72,6 +72,9 @@ public class UserEntity {
 	
 	@OneToMany(mappedBy = "userCart")
 	private List<CartEntity> listCart = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "userFavorite")
+	private List<FavoriteEntity> listFavorite = new ArrayList<>();
 
 	public Date getCreateDate() {
 		return createDate;
@@ -207,6 +210,14 @@ public class UserEntity {
 
 	public void setListService(List<ServiceEntity> listService) {
 		this.listService = listService;
+	}
+
+	public List<FavoriteEntity> getListFavorite() {
+		return listFavorite;
+	}
+
+	public void setListFavorite(List<FavoriteEntity> listFavorite) {
+		this.listFavorite = listFavorite;
 	}
 	
 }

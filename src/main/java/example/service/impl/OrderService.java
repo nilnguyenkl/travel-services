@@ -14,13 +14,18 @@ import example.config.jwt.CustomUserDetails;
 import example.entity.OrderEntity;
 import example.entity.OrderItemByTicketEntity;
 import example.entity.OrderItemEntity;
+import example.entity.ScheduleEntity;
+import example.entity.TicketEntity;
 import example.entity.UserEntity;
 import example.payload.request.CartRequest;
 import example.payload.request.InforRequest;
 import example.payload.request.OrderRequest;
+import example.payload.response.CalenderOrderResponse;
 import example.payload.response.OrderItemResponse;
 import example.payload.response.OrderObjectResponse;
 import example.payload.response.OrderResponse;
+import example.payload.response.RangeOrderResponse;
+import example.payload.response.ScheduleResponse;
 import example.payload.response.TicketResponse;
 import example.repository.CartItemByTicketRepository;
 import example.repository.CartItemRepository;
@@ -28,6 +33,7 @@ import example.repository.CartRepository;
 import example.repository.OrderItemByTicketRepository;
 import example.repository.OrderItemRepository;
 import example.repository.OrderRepository;
+import example.repository.ScheduleRepository;
 import example.repository.ServiceRepository;
 import example.repository.TicketRepository;
 import example.repository.UserRepository;
@@ -62,6 +68,9 @@ public class OrderService implements IOrderService {
 	
 	@Autowired
 	TicketRepository ticketRepository;
+	
+	@Autowired
+	ScheduleRepository scheduleRepository;
 
 	@Override
 	public Optional<OrderResponse> createOrder(OrderRequest request) {
@@ -86,6 +95,7 @@ public class OrderService implements IOrderService {
 		if (rsOrder != null) {
 			
 			List<OrderItemEntity> listOrderItem = new ArrayList<>();
+			
 			for (int i = 0; i < request.getItems().size(); i++) {
 				OrderItemEntity orderItem = new OrderItemEntity();
 				orderItem.setCreateDate(new Date());
@@ -96,6 +106,7 @@ public class OrderService implements IOrderService {
 				orderItem.setOrderOrderItem(rsOrder);
 				orderItem.setTotal(totalOrderItemPrice(request.getItems().get(i).getTickets()));
 				orderItem.setServiceOrderItem(serviceRepository.findOneById(request.getItems().get(i).getIdService()));
+				orderItem.setStatus("order");
 				OrderItemEntity rsOrderItem = orderItemRepository.save(orderItem);
 				listOrderItem.add(rsOrderItem);
 				
@@ -106,7 +117,14 @@ public class OrderService implements IOrderService {
 						orderItemByTicketEntity.setCurrentPrice(ticket.getValueTicket());
 						orderItemByTicketEntity.setType(ticket.getTypeTicket());
 						orderItemByTicketEntity.setOrderItemBy(rsOrderItem);
-						orderItemByTicketEntity.setTicketBy(ticketRepository.findOneById(ticket.getIdTicket()));
+						
+						// Handle ticket by
+						TicketEntity ticketEntity = ticketRepository.findOneById(ticket.getIdTicket());
+						orderItemByTicketEntity.setTicketBy(ticketEntity);
+						
+						ticketEntity.setAmount(ticketEntity.getAmount() - ticket.getAmountTicket());	
+						ticketRepository.save(ticketEntity);
+						
 						orderItemByTicketRepository.save(orderItemByTicketEntity);
 					}
 				}
@@ -253,6 +271,73 @@ public class OrderService implements IOrderService {
 			lstItem.add(item);	
 		}
 		response.setItems(lstItem);
+		
+		return response;
+	}
+
+
+	@Override
+	public List<CalenderOrderResponse> listCalenderOrderByUser() {
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		List<CalenderOrderResponse> response = new ArrayList<>();
+		
+		List<OrderEntity> listOrder = orderRepository.findAllByUserOrderId(userEntity.getId());
+		for (OrderEntity order : listOrder) {
+			List<OrderItemEntity> items = orderItemRepository.findAllByOrderOrderItem(order);
+			for (OrderItemEntity item : items) {
+				CalenderOrderResponse rs = new CalenderOrderResponse();
+				rs.setBookDay(item.getBookDay());
+				rs.setBookTime(item.getBookTime());
+				rs.setService(serviceRepository.findOneById(item.getServiceOrderItem().getId()).getName());
+				rs.setStatus(item.getStatus());
+				response.add(rs);
+			}
+		}
+		return response;
+	}
+
+
+	@Override
+	public RangeOrderResponse rangeOrder(String day, Long idService) {
+		
+		RangeOrderResponse response = new RangeOrderResponse();
+		
+		List<TicketResponse> tickets = new ArrayList<>();
+		List<ScheduleResponse> schedules = new ArrayList<>();
+		
+		List<ScheduleEntity> listSchedule = scheduleRepository.findAllByServiceScheduleId(idService);
+		List<TicketEntity> listTicket = ticketRepository.findAllByServiceTicketId(idService);
+		
+		for (TicketEntity ticket : listTicket) {
+			TicketResponse ticketResponse = new TicketResponse();
+			ticketResponse.setIdTicket(ticket.getId());
+			ticketResponse.setAmountTicket(ticket.getAmount());
+			ticketResponse.setNote(ticket.getNote());
+			ticketResponse.setTypeTicket(ticket.getType());
+			ticketResponse.setValueTicket(ticket.getValue());
+			tickets.add(ticketResponse);
+		}
+		
+		for (ScheduleEntity schedule : listSchedule) {
+			ScheduleResponse scheduleResponse = new ScheduleResponse();
+			
+			List<OrderItemEntity> items = orderItemRepository.findAllByBookDayAndServiceOrderItemAndBookTime(day, serviceRepository.findOneById(idService), schedule.getTime());
+			
+			scheduleResponse.setId(schedule.getId());
+			scheduleResponse.setTime(schedule.getTime());
+			scheduleResponse.setQuantityPerDay(schedule.getQuantityperday() - items.size());
+			
+			schedules.add(scheduleResponse);
+		}
+		
+		// Set value
+		response.setId(idService);
+		response.setTickets(tickets);
+		response.setSchedules(schedules);
 		
 		return response;
 	}

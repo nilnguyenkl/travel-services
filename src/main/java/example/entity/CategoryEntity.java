@@ -21,6 +21,9 @@ public class CategoryEntity {
 	@Column
 	private String name;
 	
+	@Column
+	private String icon;
+	
 	@OneToMany(mappedBy = "categoryService")
 	private List<ServiceEntity> listService = new ArrayList<>();
 
@@ -47,5 +50,13 @@ public class CategoryEntity {
 	public void setListService(List<ServiceEntity> listService) {
 		this.listService = listService;
 	}
-	
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+		
 }

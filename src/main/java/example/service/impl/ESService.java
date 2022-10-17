@@ -2,7 +2,10 @@ package example.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -45,22 +48,23 @@ public class ESService implements IESService {
 	public List<ServiceModel> getAllService(Pageable pageable, Long idCategory, Long idArea, String search) {
 		List<ServiceModel> response = new ArrayList<>();
 		List<ESMService> services = new ArrayList<>();
-		if (search.isEmpty()) {
-			if (idArea == 0) {
-				if (idCategory != 0) {
-					services = esRepository.findAllByIdCategory(idCategory, pageable).getContent();
-				}
-			} else {
-				if (idCategory == 0) {
-					services = esRepository.findAllByIdArea(idArea, pageable).getContent();
-				} else {
-					services = esRepository.findAllByIdAreaAndIdCategory(idArea, idCategory, pageable).getContent();
-				}
-			}
-		} else {
-			// services = esRepository.findAllByNameLikeIgnoreCase(search,
-			// pageable).getContent();
+		
+		NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+				  .withQuery(QueryBuilders.multiMatchQuery(search)
+				    .field("name")
+				    .field("area.name")
+				    .field("category.name")
+				    .type(MultiMatchQueryBuilder.Type.BEST_FIELDS))
+				  .build();		
+		
+		searchQuery.setPageable(pageable);
+		SearchHits<ESMService> data = elasticsearchOperations.search(searchQuery, ESMService.class, IndexCoordinates.of(PRODUCT_INDEX));
+		
+		for (SearchHit<ESMService> hit : data) {
+			services.add(hit.getContent());
 		}
+			
+		
 		for (ESMService service : services) {
 			response.add(convertToServiceModel(service));
 		}
@@ -68,33 +72,11 @@ public class ESService implements IESService {
 		return response;
 	}
 
-	public List<ServiceModel> getAllService2(String txtsearch) {
-		List<ServiceModel> response = new ArrayList<>();
-
-
-		NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-				  .withQuery(QueryBuilders.multiMatchQuery(txtsearch)
-				    .field("name")
-				    .field("description")
-				    .type(MultiMatchQueryBuilder.Type.BEST_FIELDS))
-				  .build();
-
-		SearchHits<ESMService> services = elasticsearchOperations.search(searchQuery, ESMService.class, IndexCoordinates.of(PRODUCT_INDEX));
-		
-		for (SearchHit<ESMService> hit : services) {
-			response.add(convertToServiceModel(hit.getContent()));
-		}
-		
-		return response;
-	}
-	
-
-
 	public ServiceModel convertToServiceModel(ESMService request) {
 		ServiceModel model = new ServiceModel();
 		model.setId(request.getId());
-		model.setIdArea(request.getIdArea());
-		model.setIdCategory(request.getIdCategory());
+		model.setArea(request.getArea());
+		model.setCategory(request.getCategory());
 		model.setDescription(request.getDescription());
 		model.setCreateDate(request.getCreateDate());
 		model.setImage(request.getImage());

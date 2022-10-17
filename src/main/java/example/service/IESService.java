@@ -8,7 +8,9 @@ import example.elasticsearch.ESMService;
 import example.elasticsearch.model.ServiceModel;
 
 public interface IESService {
+	
 	void addServiceIntoElastic(ESMService esmService);
+	
 	void modifyServiceElastic(ESMService esmServvice);
 	
 	// Search
