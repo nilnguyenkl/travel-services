@@ -4,7 +4,7 @@ import java.util.List;
 
 public class LoginResponse {
 
-	private String token;
+	private String accessToken;
 	private String type = "Bearer";
 	private Long id;
 	private String username;
@@ -14,19 +14,37 @@ public class LoginResponse {
 
 	public LoginResponse(String accessToken, String refreshToken, Long id, String username, String email, List<String> roles) {
 		this.id = id;
-		this.token = accessToken;
+		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;		
 		this.username = username;
 		this.email = email;
 		this.roles = roles;
 	}
 
+
+	public String getType() {
+		return type;
+	}
+
+
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
+	}
+
+
+
 	public String getAccessToken() {
-		return token;
+		return accessToken;
 	}
 
 	public void setAccessToken(String accessToken) {
-		this.token = accessToken;
+		this.accessToken = accessToken;
 	}
 
 	public String getTokenType() {
@@ -73,4 +91,7 @@ public class LoginResponse {
 		this.refreshToken = refreshToken;
 	}
 
+
+
+	
 }

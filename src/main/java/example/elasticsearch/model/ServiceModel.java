@@ -8,9 +8,12 @@ import example.elasticsearch.ESMCategory;
 import example.elasticsearch.ESMTicket;
 
 public class ServiceModel {
+	
 	private Long id;
 	
 	private String name;
+	
+	private String address;
 	
 	private String description;
 	
@@ -116,5 +119,14 @@ public class ServiceModel {
 
 	public void setArea(ESMArea area) {
 		this.area = area;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}	
+	
 }

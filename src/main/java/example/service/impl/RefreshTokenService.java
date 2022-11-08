@@ -17,7 +17,7 @@ import example.service.IRefreshTokenService;
 @Service
 public class RefreshTokenService implements IRefreshTokenService {
 	
-	private long refreshTokenDurationMs = 86400000;
+	private long refreshTokenDurationMs = 864000000;
 
 	@Autowired
 	private RefreshTokenRepository refreshTokenRepository;

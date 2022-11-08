@@ -11,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import example.config.jwt.CustomUserDetails;
+import example.elasticsearch.ESMService;
+import example.elasticsearch.ESMTicket;
 import example.entity.OrderEntity;
 import example.entity.OrderItemByTicketEntity;
 import example.entity.OrderItemEntity;
@@ -30,6 +32,7 @@ import example.payload.response.TicketResponse;
 import example.repository.CartItemByTicketRepository;
 import example.repository.CartItemRepository;
 import example.repository.CartRepository;
+import example.repository.ESServiceRepository;
 import example.repository.OrderItemByTicketRepository;
 import example.repository.OrderItemRepository;
 import example.repository.OrderRepository;
@@ -71,6 +74,9 @@ public class OrderService implements IOrderService {
 	
 	@Autowired
 	ScheduleRepository scheduleRepository;
+	
+	@Autowired
+	ESServiceRepository esServiceRepository;
 
 	@Override
 	public Optional<OrderResponse> createOrder(OrderRequest request) {
@@ -97,6 +103,11 @@ public class OrderService implements IOrderService {
 			List<OrderItemEntity> listOrderItem = new ArrayList<>();
 			
 			for (int i = 0; i < request.getItems().size(); i++) {
+				
+				// Khai bao
+				ESMService esmService = esServiceRepository.findOneById(request.getItems().get(i).getIdService());
+				List<ESMTicket> esmTickets = new ArrayList<>();
+				
 				OrderItemEntity orderItem = new OrderItemEntity();
 				orderItem.setCreateDate(new Date());
 				orderItem.setModifiedDate(new Date());
@@ -112,6 +123,7 @@ public class OrderService implements IOrderService {
 				
 				if (rsOrderItem != null) {
 					for (TicketResponse ticket : request.getItems().get(i).getTickets()) {
+						
 						OrderItemByTicketEntity orderItemByTicketEntity = new OrderItemByTicketEntity();
 						orderItemByTicketEntity.setAmount(ticket.getAmountTicket());
 						orderItemByTicketEntity.setCurrentPrice(ticket.getValueTicket());
@@ -121,11 +133,12 @@ public class OrderService implements IOrderService {
 						// Handle ticket by
 						TicketEntity ticketEntity = ticketRepository.findOneById(ticket.getIdTicket());
 						orderItemByTicketEntity.setTicketBy(ticketEntity);
-						
 						ticketEntity.setAmount(ticketEntity.getAmount() - ticket.getAmountTicket());	
 						ticketRepository.save(ticketEntity);
-						
 						orderItemByTicketRepository.save(orderItemByTicketEntity);
+						
+						// Handle elasticsearch
+						esmTickets.add(convertToESMTicket(ticketEntity));
 					}
 				}
 				
@@ -134,7 +147,15 @@ public class OrderService implements IOrderService {
 					 cartItemByTicketRepository.deleteAll(cartItemByTicketRepository.findAllByCartItemById(request.getItems().get(i).getIdCartItem()));
 					 cartItemRepository.deleteById(request.getItems().get(i).getIdCartItem());
 				}
+				
+				// Update order elasticsearch
+				esmService.setOrders(esmService.getOrders() + 1);
+				esmService.setTicket(esmTickets);
+				esServiceRepository.save(esmService);
+				
 			}
+			
+			
 			
 			return Optional.ofNullable(new OrderResponse(rsOrder.getId(), convertToInforRequest(rsOrder.getId()), convertToListCartRequest(listOrderItem)));
 		} throw new NullPointerException();
@@ -189,6 +210,11 @@ public class OrderService implements IOrderService {
 				ticket.setValueTicket(orderItemTicket.getCurrentPrice());
 				listTicket.add(ticket);
 			}
+			ESMService service = esServiceRepository.findOneById(listOrderItem.get(i).getServiceOrderItem().getId());
+			cartRequest.setName(service.getName());
+			cartRequest.setDescription(service.getDescription());
+			cartRequest.setUrl(service.getImage());
+			
 			cartRequest.setTickets(listTicket);
 			listCartRequest.add(cartRequest);
 		}
@@ -267,6 +293,10 @@ public class OrderService implements IOrderService {
 				ticket.setValueTicket(itembyticket.getCurrentPrice());
 				tickets.add(ticket);
 			}
+			ESMService service = esServiceRepository.findOneById(orderItem.getServiceOrderItem().getId());
+			item.setName(service.getName());
+			item.setDescription(service.getDescription());
+			item.setUrl(service.getImage());
 			item.setTickets(tickets);
 			lstItem.add(item);	
 		}
@@ -340,5 +370,11 @@ public class OrderService implements IOrderService {
 		response.setSchedules(schedules);
 		
 		return response;
+	}
+
+
+	@Override
+	public ESMTicket convertToESMTicket(TicketEntity ticket) {
+		return new ESMTicket(ticket.getId(), ticket.getValue(), ticket.getType(), ticket.getAmount());
 	}
 }

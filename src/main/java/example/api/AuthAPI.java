@@ -26,8 +26,9 @@ import example.payload.request.ResetPasswordRequest;
 import example.payload.request.TokenRefreshRequest;
 import example.payload.response.ForgotPasswordResponse;
 import example.payload.response.LoginResponse;
-import example.payload.response.MessageResponse;
+import example.payload.response.RegisterResponseStatus;
 import example.payload.response.TokenRefreshResponse;
+import example.repository.UserRepository;
 import example.service.IUserService;
 import example.service.impl.RefreshTokenService;
 import net.bytebuddy.utility.RandomString;
@@ -35,7 +36,10 @@ import net.bytebuddy.utility.RandomString;
 @CrossOrigin
 @RestController
 public class AuthAPI {
-
+	
+	@Autowired
+	private UserRepository userRepository;
+	
 	@Autowired
 	private IUserService userService;
 
@@ -49,8 +53,8 @@ public class AuthAPI {
 	AuthenticationManager authenticationManager;
 
 	@PostMapping(value = "/auth/register")
-	public MessageResponse createUser(@RequestBody RegisterRequest model) {
-		return new MessageResponse(userService.createUser(model));
+	public RegisterResponseStatus createUser(@RequestBody RegisterRequest model) {
+		return userService.createUser(model);
 	}
 
 	@PostMapping("/auth/login")
@@ -60,6 +64,7 @@ public class AuthAPI {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity user = userRepository.findOneById(userDetails.getId());
 		String jwt = tokenProvider.generateJwtToken(userDetails);
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 				.collect(Collectors.toList());

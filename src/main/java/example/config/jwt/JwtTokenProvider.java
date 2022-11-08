@@ -15,7 +15,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 public class JwtTokenProvider {
 
 	private final String JWT_SECRET = "lamlam";
-	private final long JWT_EXPIRATION = 3600000;
+	private final long JWT_EXPIRATION = 36000000;
 
 	public String generateJwtToken(CustomUserDetails userPrincipal) {
 		return generateTokenFromUsername(userPrincipal.getUsername());

@@ -116,7 +116,8 @@ public class ServiceService implements IServiceService {
 		response.setEvent(serviceEntity.getEvent());
 		response.setNote(serviceEntity.getNote());
 		response.setName(serviceEntity.getName());
-		
+		response.setCreateByAuthId(serviceEntity.getUserService().getId());
+		response.setUsernameAuth(serviceEntity.getUserService().getUsername());
 		// Set list reviews
 		List<ReviewEntity> reviews = reviewRepository.findAllByServiceReviewId(id, Sort.by(Sort.Direction.DESC, "id"));
 		List<ReviewsResponse> reviewsResponse = new ArrayList<>();

@@ -3,6 +3,8 @@ package example.payload.response;
 import java.util.List;
 
 public class ServiceDetailsResponse {
+	private Long createByAuthId;
+	private String usernameAuth;
 	private Long id;
 	private String name;
 	private String address;
@@ -67,4 +69,16 @@ public class ServiceDetailsResponse {
 	public void setGalleries(List<LinkDataResponse> galleries) {
 		this.galleries = galleries;
 	}
+	public Long getCreateByAuthId() {
+		return createByAuthId;
+	}
+	public void setCreateByAuthId(Long createByAuthId) {
+		this.createByAuthId = createByAuthId;
+	}
+	public String getUsernameAuth() {
+		return usernameAuth;
+	}
+	public void setUsernameAuth(String usernameAuth) {
+		this.usernameAuth = usernameAuth;
+	}	
 }

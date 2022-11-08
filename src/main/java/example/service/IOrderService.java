@@ -5,8 +5,10 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 
+import example.elasticsearch.ESMTicket;
 import example.entity.OrderEntity;
 import example.entity.OrderItemEntity;
+import example.entity.TicketEntity;
 import example.payload.request.CartRequest;
 import example.payload.request.InforRequest;
 import example.payload.request.OrderRequest;
@@ -26,6 +28,8 @@ public interface IOrderService {
 	List<CartRequest> convertToListCartRequest(List<OrderItemEntity> listOrderItem);
 	OrderObjectResponse convertToOrderObjectResponse(OrderEntity order);
 	int totalItem();
+	
+	ESMTicket convertToESMTicket(TicketEntity ticket);
 	
 	
 	List<CalenderOrderResponse> listCalenderOrderByUser();

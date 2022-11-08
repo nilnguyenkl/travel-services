@@ -28,14 +28,13 @@ public class FavoriteAPI {
 	}
 	
 	@PostMapping(value = "/favorite")
-	MessageResponse insertFavorite(@RequestParam("idService") Long idService) {
+	List<FavoriteResponse> insertFavorite(@RequestParam("idService") Long idService) {
 		return favoriteService.insertFavorite(idService);
 	}
 	
 	@DeleteMapping(value = "/favorite")
-	MessageResponse deleteFavorite(@RequestParam("idService") String idService) {
-		favoriteService.deleteFavorite(Long.parseLong(idService));
-		return new MessageResponse("Success");
+	List<FavoriteResponse> deleteFavorite(@RequestParam("idService") String idService) {
+		return favoriteService.deleteFavorite(Long.parseLong(idService));
 	}
 	
 	

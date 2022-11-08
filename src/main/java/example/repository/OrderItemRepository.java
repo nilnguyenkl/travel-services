@@ -14,4 +14,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItemEntity, Long
 	
 	List<OrderItemEntity> findAllByOrderOrderItem(OrderEntity entity);
 	List<OrderItemEntity> findAllByBookDayAndServiceOrderItemAndBookTime(String day, ServiceEntity serviceEntity, String time);
+	
+	List<OrderItemEntity> findAllByOrderOrderItemAndStatus(OrderEntity entity, String status);
 }

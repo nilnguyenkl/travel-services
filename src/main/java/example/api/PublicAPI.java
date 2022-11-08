@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,9 +38,10 @@ public class PublicAPI {
 
 	@GetMapping(value = "/public/service")
 	public GetServiceResponse getService(
+			
 			@RequestParam("page") int page, 
 			@RequestParam("limit") int limit,
-			@RequestParam(value = "sort", defaultValue = "") String sort, 
+			@RequestParam(value = "sort", defaultValue = "Default") String sort, 
 			@RequestParam(value = "search", defaultValue = "") String search,
 			@RequestParam(value = "area", defaultValue = "0") Long idArea,
 			@RequestParam(value = "category", defaultValue = "0") Long idCategory) {
@@ -47,7 +49,33 @@ public class PublicAPI {
 		GetServiceResponse response = new GetServiceResponse();
 		response.setPage(page);
 		
-		Pageable pageable = PageRequest.of(page - 1, limit);
+		Pageable pageable = null;
+		Sort sortable = null;
+		
+		if (sort.equals("AscOrders")) {
+			sortable = Sort.by("orders").ascending();
+			pageable = PageRequest.of(page - 1, limit, sortable);
+		}
+		
+		if (sort.equals("DescOrders")) {
+			sortable = Sort.by("orders").descending();
+			pageable = PageRequest.of(page - 1, limit, sortable);
+		}
+		
+		if (sort.equals("AscReviews")) {
+			sortable = Sort.by("reviews").ascending();
+			pageable = PageRequest.of(page - 1, limit, sortable);
+		}
+		
+		if (sort.equals("DescReviews")) {
+			sortable = Sort.by("reviews").descending();
+			pageable = PageRequest.of(page - 1, limit, sortable);
+		}
+		
+		if (sort.equals("Default")) {
+			pageable = PageRequest.of(page - 1, limit);
+		}
+		
 		response.setItems(esService.getAllService(pageable, idCategory, idArea, search));
 		response.setTotalPage((int)Math.ceil((double)response.getItems().size() / limit));
 		

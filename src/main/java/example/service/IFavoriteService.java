@@ -7,6 +7,6 @@ import example.payload.response.MessageResponse;
 
 public interface IFavoriteService {
 	List<FavoriteResponse> getAllFavoriteByUser();
-	void deleteFavorite(Long idService);
-	MessageResponse insertFavorite(Long idService);
+	List<FavoriteResponse> deleteFavorite(Long idService);
+	List<FavoriteResponse> insertFavorite(Long idService);
 }

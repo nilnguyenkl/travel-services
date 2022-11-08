@@ -103,7 +103,7 @@ public class FavoriteService implements IFavoriteService {
 
 	@Override
 	@Transactional
-	public void deleteFavorite(Long idService) {
+	public List<FavoriteResponse> deleteFavorite(Long idService) {
 		// Authentication
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -111,10 +111,12 @@ public class FavoriteService implements IFavoriteService {
 		
 		favoriteRepository.deleteByUserFavoriteAndServiceFavorite(userEntity, serviceRepository.findOneById(idService));
 		
+		return getAllFavoriteByUser();
+		
 	}
 
 	@Override
-	public MessageResponse insertFavorite(Long idService) {
+	public List<FavoriteResponse> insertFavorite(Long idService) {
 		// Authentication
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -127,11 +129,7 @@ public class FavoriteService implements IFavoriteService {
 		
 		FavoriteEntity response = favoriteRepository.save(entity);
 		
-		if (response != null) {
-			return new MessageResponse("Success");
-		} else {
-			return new MessageResponse("Failed");
-		}
+		return getAllFavoriteByUser();
 	}
 
 	

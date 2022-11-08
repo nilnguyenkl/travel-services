@@ -12,9 +12,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import example.config.jwt.CustomUserDetails;
+import example.elasticsearch.ESMService;
 import example.entity.CartEntity;
 import example.entity.CartItemByTicketEntity;
 import example.entity.CartItemEntity;
+import example.entity.ServiceEntity;
 import example.entity.TicketEntity;
 import example.entity.UserEntity;
 import example.payload.request.CartRequest;
@@ -23,6 +25,7 @@ import example.payload.response.TicketResponse;
 import example.repository.CartItemByTicketRepository;
 import example.repository.CartItemRepository;
 import example.repository.CartRepository;
+import example.repository.ESServiceRepository;
 import example.repository.ServiceRepository;
 import example.repository.TicketRepository;
 import example.repository.UserRepository;
@@ -48,6 +51,9 @@ public class CartService implements ICartService {
 	
 	@Autowired
 	TicketRepository ticketRepository;
+	
+	@Autowired
+	ESServiceRepository esServiceRepository;
 	
 	@Override
 	public Optional<CartResponse> createCart(CartRequest request) {
@@ -90,7 +96,17 @@ public class CartService implements ICartService {
 				cartItemByTicket.setCartTicketBy(ticketRepository.findOneById(ticket.getIdTicket()));
 				cartItemByticketRepository.save(cartItemByTicket);
 			}
-			return Optional.ofNullable(new CartResponse (rsCartItem.getId(), request.getIdService(), request.getBookDay(), request.getBookTime(), convertListTicketResponse(request)));
+			return Optional.ofNullable(
+					new CartResponse (
+							rsCartItem.getId(), 
+							request.getIdService(),
+							request.getName(),
+							request.getDescription(),
+							request.getUrl(),
+							request.getBookDay(), 
+							request.getBookTime(), 
+							convertListTicketResponse(request)
+					));
 		}
 		throw new NullPointerException();
 	}
@@ -153,7 +169,17 @@ public class CartService implements ICartService {
 			List<CartItemByTicketEntity> cartItemByTicket3 = new ArrayList<>(cartItemByTicket2);
 			cartItemByTicket3.removeAll(cartItemByTicket1);
 			cartItemByticketRepository.deleteAll(cartItemByTicket3);
-			return Optional.ofNullable(new CartResponse (cartItemId, request.getIdService(), request.getBookDay(), request.getBookTime(), convertListTicketResponse(request)));
+			return Optional.ofNullable(
+					new CartResponse (
+							cartItemId, 
+							request.getIdService(), 
+							request.getName(),
+							request.getDescription(),
+							request.getUrl(),
+							request.getBookDay(), 
+							request.getBookTime(), 
+							convertListTicketResponse(request)
+					));
 		}
 		throw new NullPointerException();
 	}
@@ -192,10 +218,14 @@ public class CartService implements ICartService {
 					ticket.setValueTicket(ticketRepository.findOneById(item.getCartTicketBy().getId()).getValue());
 					tickets.add(ticket);
 				}
-				
-				response.add(new CartResponse(
+				ESMService service = esServiceRepository.findOneById(cartItem.getServiceCartItem().getId());
+				response.add(
+					new CartResponse(
 						cartItem.getId(), 
-						cartItem.getServiceCartItem().getId(), 
+						cartItem.getServiceCartItem().getId(),
+						service.getName(),
+						service.getDescription(),
+						service.getImage(),
 						cartItem.getBookDay(),
 						cartItem.getBookTime(),
 						tickets
