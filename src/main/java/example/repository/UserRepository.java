@@ -1,5 +1,7 @@
 package example.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import example.entity.RoleEntity;
@@ -11,4 +13,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>{
 	UserEntity findOneByPhone(String phone);
 	UserEntity findOneByEmail(String email);
 	UserEntity findOneByResetPasswordToken(String token);
+	
+	List<UserEntity> findAllByRoleUser(RoleEntity role);
+	
 }

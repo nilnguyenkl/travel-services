@@ -11,10 +11,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import example.payload.response.AbloutAppResponse;
 import example.payload.response.AreaResponse;
 import example.payload.response.CategoryResponse;
 import example.payload.response.GetServiceResponse;
 import example.payload.response.ServiceDetailsResponse;
+import example.repository.OrderItemRepository;
+import example.repository.RoleRepository;
+import example.repository.ServiceRepository;
+import example.repository.UserRepository;
 import example.service.impl.AreaService;
 import example.service.impl.CategoryService;
 import example.service.impl.ESService;
@@ -35,6 +40,18 @@ public class PublicAPI {
 	
 	@Autowired
 	ServiceService serviceService;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	@Autowired
+	RoleRepository roleRepository;
+	
+	@Autowired
+	OrderItemRepository orderitemRepository;
+	
+	@Autowired
+	ServiceRepository serviceRepository;
 
 	@GetMapping(value = "/public/service")
 	public GetServiceResponse getService(
@@ -97,5 +114,17 @@ public class PublicAPI {
 	@GetMapping(value = "/public/serviceDetails")
 	public ServiceDetailsResponse getServiceDetails(@RequestParam(value = "idService") Long idService) {
 		return serviceService.getServiceDetails(idService);
+	}
+	
+	@GetMapping(value = "/public/about")
+	public AbloutAppResponse getAboutApp() {
+		AbloutAppResponse response = new AbloutAppResponse(); 
+		
+		response.setNumUser(userRepository.findAllByRoleUser(roleRepository.findOneByRole("USER")).size());
+		response.setNumAdmin(userRepository.findAllByRoleUser(roleRepository.findOneByRole("ADMIN")).size());
+		response.setNumService(serviceRepository.findAll().size());
+		response.setNumOrder(orderitemRepository.findAll().size());
+		
+		return response; 
 	}
 }

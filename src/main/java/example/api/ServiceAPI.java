@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,6 +32,7 @@ import example.payload.request.LinkDataRequest;
 import example.payload.request.ModifyServiceRequest;
 import example.payload.request.ScheduleRequest;
 import example.payload.request.TicketRequest;
+import example.payload.response.GetServiceByAdminResponse;
 import example.payload.response.LinkDataResponse;
 import example.payload.response.MessageResponse;
 import example.payload.response.ScheduleResponse;
@@ -197,4 +199,10 @@ public class ServiceAPI {
 		}
 		throw new ServiceException("Can not modify service");
 	}
+	
+	@GetMapping(value = "/admin/service")
+	public List<GetServiceByAdminResponse> getAllServiceByAdmin() {
+		return serviceService.getAllServiceByAdmin();
+	}
+	
 }

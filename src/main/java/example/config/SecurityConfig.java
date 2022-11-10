@@ -65,6 +65,7 @@ public class SecurityConfig {
 		http.authorizeRequests()
 				.antMatchers("/auth/register").permitAll()
 				.antMatchers("/auth/refreshtoken").permitAll()
+				.antMatchers("/auth/changepassword").permitAll()
 				.antMatchers("/auth/forgotpassword").permitAll()
 				.antMatchers("/auth/resetpassword").permitAll()
 				.antMatchers("/auth/login").permitAll()
@@ -73,6 +74,7 @@ public class SecurityConfig {
 				.antMatchers("/public/serviceDetails").permitAll()
 				.antMatchers("/public/area").permitAll()
 				.antMatchers("/public/category").permitAll()
+				.antMatchers("/public/about").permitAll()
 				.anyRequest().authenticated();
 
 		return http.build();

@@ -6,4 +6,5 @@ import example.entity.RoleEntity;
 
 public interface RoleRepository extends JpaRepository<RoleEntity, Long>{
 	RoleEntity findOneById(Long id);
+	RoleEntity findOneByRole(String name);
 }

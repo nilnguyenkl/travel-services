@@ -8,5 +8,6 @@ import example.entity.AreaEntity;
 
 public interface AreaRepository extends JpaRepository<AreaEntity, Long> {
 	AreaEntity findOneById(Long id);
+	AreaEntity findOneByName(String name);
 	List<AreaEntity> findAll();
 }

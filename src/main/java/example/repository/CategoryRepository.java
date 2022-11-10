@@ -8,5 +8,6 @@ import example.entity.CategoryEntity;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 	CategoryEntity findOneById(Long id);
+	CategoryEntity findOneByName(String name);
 	List<CategoryEntity> findAll();
 }

@@ -16,18 +16,24 @@ import example.entity.AreaEntity;
 import example.entity.CategoryEntity;
 import example.entity.LinkDataEntity;
 import example.entity.ReviewEntity;
+import example.entity.ScheduleEntity;
 import example.entity.ServiceEntity;
 import example.entity.TicketEntity;
 import example.entity.UserEntity;
 import example.payload.request.ServiceRequest;
+import example.payload.response.GetServiceByAdminResponse;
 import example.payload.response.LinkDataResponse;
 import example.payload.response.ReviewsResponse;
+import example.payload.response.ScheduleResponse;
 import example.payload.response.ServiceDetailsResponse;
+import example.payload.response.ServiceResponse;
+import example.payload.response.TicketResponse;
 import example.payload.response.UserReviewResponse;
 import example.repository.AreaRepository;
 import example.repository.CategoryRepository;
 import example.repository.LinkDataRepository;
 import example.repository.ReviewRepository;
+import example.repository.ScheduleRepository;
 import example.repository.ServiceRepository;
 import example.repository.TicketRepository;
 import example.repository.UserRepository;
@@ -57,6 +63,9 @@ public class ServiceService implements IServiceService {
 	
 	@Autowired
 	LinkDataRepository linkDataRepository;
+	
+	@Autowired
+	ScheduleRepository scheduleRepo;
 
 	@Override
 	public Optional<ServiceEntity> createService(ServiceRequest request) {
@@ -167,6 +176,73 @@ public class ServiceService implements IServiceService {
 		response.setUrl(linkDataEntity.getDataUrl());
 		response.setType(linkDataEntity.getType());
 		return response;
+	}
+
+	@Override
+	public List<GetServiceByAdminResponse> getAllServiceByAdmin() {
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		
+		List<GetServiceByAdminResponse> listResponse = new ArrayList<>();
+		
+		List<ServiceEntity> listService = serviceRepository.findAllByUserService(userEntity, Sort.by("id").descending());
+		
+		for (ServiceEntity entity : listService) {
+			
+			ServiceResponse serviceResponse = new ServiceResponse();
+			serviceResponse.setArea(entity.getAreaService().getName());
+			serviceResponse.setCategory(entity.getCategoryService().getName());
+			serviceResponse.setDescription(entity.getDescription());
+			serviceResponse.setEvent(entity.getEvent());
+			serviceResponse.setIdService(entity.getId());
+			serviceResponse.setName(entity.getName());
+			
+			List<LinkDataEntity> listLink = linkDataRepository.findAllByServiceStorageId(entity.getId());
+			List<LinkDataResponse> links = new ArrayList<>();
+			for (LinkDataEntity link : listLink) {
+				LinkDataResponse linkResponse = new LinkDataResponse();
+				linkResponse.setId(link.getId());
+				linkResponse.setType(link.getType());
+				linkResponse.setUrl(link.getDataUrl());
+				links.add(linkResponse);
+			}
+			
+			List<ScheduleEntity> listSchedule = scheduleRepo.findAllByServiceScheduleId(entity.getId());
+			List<ScheduleResponse> schedules = new ArrayList<>();
+			for (ScheduleEntity schedule : listSchedule) {
+				ScheduleResponse scheduleResponse = new ScheduleResponse();
+				scheduleResponse.setId(schedule.getId());
+				scheduleResponse.setQuantityPerDay(schedule.getQuantityperday());
+				scheduleResponse.setTime(schedule.getTime());
+				schedules.add(scheduleResponse);
+			}
+			
+			List<TicketEntity> listTicket = ticketRepository.findAllByServiceTicketId(entity.getId());
+			List<TicketResponse> tickets = new ArrayList<>();
+			for (TicketEntity ticket : listTicket) {
+				TicketResponse ticketResponse = new TicketResponse();
+				ticketResponse.setIdTicket(ticket.getId());
+				ticketResponse.setTypeTicket(ticket.getType());
+				ticketResponse.setValueTicket(ticket.getValue());
+				ticketResponse.setAmountTicket(ticket.getAmount());
+				ticketResponse.setNote(ticket.getNote());
+				tickets.add(ticketResponse);
+			}
+			
+			
+			GetServiceByAdminResponse response = new GetServiceByAdminResponse();
+			response.setService(serviceResponse);
+			response.setGalleries(links);
+			response.setSchedule(schedules);
+			response.setTicket(tickets);
+			// Set value
+			listResponse.add(response);
+		}
+		
+		return listResponse;
 	}
 	
 }

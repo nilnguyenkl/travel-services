@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,14 @@ import example.entity.OrderEntity;
 import example.entity.OrderItemByTicketEntity;
 import example.entity.OrderItemEntity;
 import example.entity.ScheduleEntity;
+import example.entity.ServiceEntity;
 import example.entity.TicketEntity;
 import example.entity.UserEntity;
 import example.payload.request.CartRequest;
 import example.payload.request.InforRequest;
 import example.payload.request.OrderRequest;
 import example.payload.response.CalenderOrderResponse;
+import example.payload.response.GetOrderItemResponse;
 import example.payload.response.OrderItemResponse;
 import example.payload.response.OrderObjectResponse;
 import example.payload.response.OrderResponse;
@@ -376,5 +379,66 @@ public class OrderService implements IOrderService {
 	@Override
 	public ESMTicket convertToESMTicket(TicketEntity ticket) {
 		return new ESMTicket(ticket.getId(), ticket.getValue(), ticket.getType(), ticket.getAmount());
+	}
+
+
+	@Override
+	public List<GetOrderItemResponse> getAllOrderItemByStatus(String status) {
+		
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		List<OrderEntity> listOrder = orderRepository.findAllByUserOrderId(userEntity.getId());
+		List<GetOrderItemResponse> listResponse = new ArrayList<>();
+		
+		for (OrderEntity entity : listOrder) {
+			
+			List<OrderItemEntity> orderItemEntity = orderItemRepository.findAllByOrderOrderItemAndStatus(entity, status);
+			
+			for (OrderItemEntity item : orderItemEntity) {
+				
+				ServiceEntity service = serviceRepository.findOneById(item.getServiceOrderItem().getId());
+				
+				InforRequest infor = new InforRequest();
+				infor.setEmail(entity.getEmail());
+				infor.setFullname(entity.getFullname());
+				infor.setPhone(entity.getPhone());
+				
+				List<OrderItemByTicketEntity> tickets = orderItemByTicketRepository.findAllByOrderItemById(entity.getId());
+				List<TicketResponse> listTicketResponse = new ArrayList<>();
+				for (OrderItemByTicketEntity ticket : tickets) {
+					TicketResponse ticketResponse = new TicketResponse();
+					ticketResponse.setIdTicket(ticket.getId());
+					ticketResponse.setAmountTicket(ticket.getAmount());
+					ticketResponse.setTypeTicket(ticket.getType());
+					ticketResponse.setValueTicket(ticket.getCurrentPrice());
+					ticketResponse.setNote(ticket.getTicketBy().getNote());
+					listTicketResponse.add(ticketResponse);
+				}
+				
+				
+				GetOrderItemResponse response = new GetOrderItemResponse();
+				
+				response.setId(item.getId());
+				response.setIdOrder(entity.getId());
+				response.setIdService(service.getId());
+				response.setNameService(service.getName());
+				response.setDescription(service.getDescription());
+				response.setUrl(esServiceRepository.findOneById(item.getServiceOrderItem().getId()).getImage());
+				response.setBookDay(item.getBookDay());
+				response.setBookTime(item.getBookTime());
+				response.setTotal(item.getTotal());
+				response.setInfor(infor);
+				response.setTickets(listTicketResponse);
+				response.setCreateDate(item.getCreateDate());
+				response.setModifiedDate(item.getModifiedDate());
+				
+				listResponse.add(response);
+			}
+			
+		}
+		return listResponse;
 	}
 }

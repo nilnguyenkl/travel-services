@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import example.config.jwt.JwtTokenProvider;
 import example.entity.RefreshTokenEntity;
 import example.entity.UserEntity;
 import example.exception.TokenRefreshException;
+import example.payload.request.ChangePasswordRequest;
 import example.payload.request.ForgotPasswordRequest;
 import example.payload.request.LoginRequest;
 import example.payload.request.RegisterRequest;
@@ -26,6 +28,7 @@ import example.payload.request.ResetPasswordRequest;
 import example.payload.request.TokenRefreshRequest;
 import example.payload.response.ForgotPasswordResponse;
 import example.payload.response.LoginResponse;
+import example.payload.response.MessageResponse;
 import example.payload.response.RegisterResponseStatus;
 import example.payload.response.TokenRefreshResponse;
 import example.repository.UserRepository;
@@ -72,6 +75,27 @@ public class AuthAPI {
 		return new LoginResponse(jwt, refreshToken.getToken(), userDetails.getId(), userDetails.getUsername(),
 				userDetails.getEmail(), roles);
 	}
+	
+	@PostMapping("/auth/changepassword")
+	public MessageResponse changePassword(@RequestBody ChangePasswordRequest request) {
+		
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		
+		UserEntity entity = userRepository.findOneByUsername(request.getUsername());
+		boolean isCorrect = encoder.matches(request.getOldPassword(), entity.getPassword());
+		
+		if (isCorrect) {
+			entity.setPassword(encoder.encode(request.getNewPassword()));
+			entity = userRepository.save(entity);
+			if (entity != null) {
+				return new MessageResponse("Success");
+			} else {
+				return new MessageResponse("Something was wrong");
+			}
+		} else {
+			return new MessageResponse("Password incorrect");
+		}
+	}
 
 	@PostMapping("/auth/refreshtoken")
 	public ResponseEntity<?> refreshtoken(@RequestBody TokenRefreshRequest request) {
@@ -103,5 +127,5 @@ public class AuthAPI {
 			return "Success";
 		}
 	}
-
+	
 }

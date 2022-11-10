@@ -56,7 +56,6 @@ public class ProfileAPI {
 	
 	@PostMapping(value = "/avatar/upload")
 	public Object updateAvatar(@RequestPart MultipartFile file) {
-		
 		try {
 			
 			Map upload = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
@@ -74,8 +73,11 @@ public class ProfileAPI {
 			return new MessageResponse("Failed");
 		}
 		
-		
 	}
+	
+//	@GetMapping(value = "/user/orderitem")
+//	public 
+	
 	
 	
 	
