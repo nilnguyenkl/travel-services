@@ -33,6 +33,7 @@ import example.payload.request.ModifyServiceRequest;
 import example.payload.request.ScheduleRequest;
 import example.payload.request.TicketRequest;
 import example.payload.response.GetServiceByAdminResponse;
+import example.payload.response.GetServiceDetailsResponse;
 import example.payload.response.LinkDataResponse;
 import example.payload.response.MessageResponse;
 import example.payload.response.ScheduleResponse;
@@ -204,5 +205,12 @@ public class ServiceAPI {
 	public List<GetServiceByAdminResponse> getAllServiceByAdmin() {
 		return serviceService.getAllServiceByAdmin();
 	}
+	
+	@GetMapping(value = "/admin/serviceDetails")
+	public GetServiceDetailsResponse getServiceDetails(@RequestParam("idService") String idService) {
+		return serviceService.getServiceDetailss(Long.parseLong(idService));
+	}
+	
+	
 	
 }

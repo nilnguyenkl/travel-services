@@ -67,6 +67,7 @@ public class SecurityConfig {
 				.antMatchers("/auth/refreshtoken").permitAll()
 				.antMatchers("/auth/changepassword").permitAll()
 				.antMatchers("/auth/forgotpassword").permitAll()
+				.antMatchers("/admin/serviceDetails").permitAll()
 				.antMatchers("/auth/resetpassword").permitAll()
 				.antMatchers("/auth/login").permitAll()
 				.antMatchers("/order/range").permitAll()

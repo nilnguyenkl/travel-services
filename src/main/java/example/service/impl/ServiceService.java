@@ -21,7 +21,12 @@ import example.entity.ServiceEntity;
 import example.entity.TicketEntity;
 import example.entity.UserEntity;
 import example.payload.request.ServiceRequest;
+import example.payload.response.AreaResponse;
+import example.payload.response.CategoryResponse;
 import example.payload.response.GetServiceByAdminResponse;
+import example.payload.response.GetServiceDetailsResponse;
+import example.payload.response.InforServiceDetailsResponse;
+import example.payload.response.LinkDataDetailsResponse;
 import example.payload.response.LinkDataResponse;
 import example.payload.response.ReviewsResponse;
 import example.payload.response.ScheduleResponse;
@@ -243,6 +248,72 @@ public class ServiceService implements IServiceService {
 		}
 		
 		return listResponse;
+	}
+
+	@Override
+	public GetServiceDetailsResponse getServiceDetailss(Long idService) {
+		
+		ServiceEntity service = serviceRepository.findOneById(idService);
+		
+		InforServiceDetailsResponse infor = new InforServiceDetailsResponse();
+		
+		CategoryResponse cate = new CategoryResponse();
+		cate.setId(service.getCategoryService().getId());
+		cate.setName(service.getCategoryService().getName());
+		cate.setIcon(service.getCategoryService().getIcon());
+		
+		AreaResponse are = new AreaResponse(); 
+		are.setId(service.getAreaService().getId());
+		are.setName(service.getAreaService().getName());
+		are.setUrl(service.getAreaService().getDataUrl());
+		
+		infor.setId(service.getId());
+		infor.setName(service.getName());
+		infor.setDescription(service.getDescription());
+		infor.setEvent(service.getEvent());
+		infor.setAddress(service.getAddress());
+		infor.setCategory(cate);
+		infor.setArea(are);
+		
+		List<LinkDataEntity> listLink = linkDataRepository.findAllByServiceStorageId(idService);
+		List<LinkDataDetailsResponse> links = new ArrayList<>();
+		for (LinkDataEntity link : listLink) {
+			LinkDataDetailsResponse linkResponse = new LinkDataDetailsResponse();
+			linkResponse.setId(link.getId());
+			linkResponse.setType(link.getType());
+			linkResponse.setUrl(link.getDataUrl());
+			linkResponse.setPublicId(link.getPublicId());
+			links.add(linkResponse);
+		}
+		
+		List<ScheduleEntity> listSchedule = scheduleRepo.findAllByServiceScheduleId(idService);
+		List<ScheduleResponse> schedules = new ArrayList<>();
+		for (ScheduleEntity schedule : listSchedule) {
+			ScheduleResponse scheduleResponse = new ScheduleResponse();
+			scheduleResponse.setId(schedule.getId());
+			scheduleResponse.setQuantityPerDay(schedule.getQuantityperday());
+			scheduleResponse.setTime(schedule.getTime());
+			schedules.add(scheduleResponse);
+		}
+		
+		List<TicketEntity> listTicket = ticketRepository.findAllByServiceTicketId(idService);
+		List<TicketResponse> tickets = new ArrayList<>();
+		for (TicketEntity ticket : listTicket) {
+			TicketResponse ticketResponse = new TicketResponse();
+			ticketResponse.setIdTicket(ticket.getId());
+			ticketResponse.setTypeTicket(ticket.getType());
+			ticketResponse.setValueTicket(ticket.getValue());
+			ticketResponse.setAmountTicket(ticket.getAmount());
+			ticketResponse.setNote(ticket.getNote());
+			tickets.add(ticketResponse);
+		}
+		
+		GetServiceDetailsResponse response = new GetServiceDetailsResponse();
+		response.setService(infor);
+		response.setGalleries(links);
+		response.setSchedule(schedules);
+		response.setTicket(tickets);
+		return response;
 	}
 	
 }
