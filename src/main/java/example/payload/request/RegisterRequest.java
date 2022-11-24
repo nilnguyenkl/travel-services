@@ -9,6 +9,7 @@ public class RegisterRequest {
 	private String sex;
 	private String phone;
 	private String email;
+	private boolean provider;
 	private Long idRole;
 	
 	public String getUsername() {
@@ -58,5 +59,11 @@ public class RegisterRequest {
 	}
 	public void setSex(String sex) {
 		this.sex = sex;
+	}
+	public boolean isProvider() {
+		return provider;
+	}
+	public void setProvider(boolean provider) {
+		this.provider = provider;
 	}
 }

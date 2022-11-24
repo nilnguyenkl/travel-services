@@ -8,30 +8,22 @@ public class LoginResponse {
 	private String type = "Bearer";
 	private Long id;
 	private String username;
+	private String phone;
 	private String email;
 	private List<String> roles;
 	private String refreshToken;
+	private boolean provider;
 
-	public LoginResponse(String accessToken, String refreshToken, Long id, String username, String email, List<String> roles) {
+	public LoginResponse(String accessToken, String refreshToken, Long id, String username, String phone, String email, List<String> roles, boolean provider) {
 		this.id = id;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;		
 		this.username = username;
+		this.phone = phone;
 		this.email = email;
 		this.roles = roles;
+		this.provider = provider;
 	}
-
-
-	public String getType() {
-		return type;
-	}
-
-
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 
 	public void setRoles(List<String> roles) {
 		this.roles = roles;
@@ -92,6 +84,23 @@ public class LoginResponse {
 	}
 
 
+	public String getPhone() {
+		return phone;
+	}
 
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+
+	public boolean isProvider() {
+		return provider;
+	}
+
+
+	public void setProvider(boolean provider) {
+		this.provider = provider;
+	}
 	
 }

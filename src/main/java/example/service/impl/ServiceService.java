@@ -130,6 +130,8 @@ public class ServiceService implements IServiceService {
 		response.setEvent(serviceEntity.getEvent());
 		response.setNote(serviceEntity.getNote());
 		response.setName(serviceEntity.getName());
+		response.setArea(serviceEntity.getAreaService().getName());
+		response.setCategory(serviceEntity.getCategoryService().getName());
 		response.setCreateByAuthId(serviceEntity.getUserService().getId());
 		response.setUsernameAuth(serviceEntity.getUserService().getUsername());
 		// Set list reviews

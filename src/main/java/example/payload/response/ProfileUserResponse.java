@@ -6,6 +6,9 @@ public class ProfileUserResponse {
 	private int numOrderApproved;
 	private int numOrderExperienced;
 	
+	private int numServiceForAdmin;
+	private int numOrderForAdmin;
+	
 	private ProfileResponse infor;
 	
 	public int getNumOrderWaiting() {
@@ -38,5 +41,21 @@ public class ProfileUserResponse {
 	
 	public void setInfor(ProfileResponse infor) {
 		this.infor = infor;
+	}
+
+	public int getNumServiceForAdmin() {
+		return numServiceForAdmin;
+	}
+
+	public void setNumServiceForAdmin(int numServiceForAdmin) {
+		this.numServiceForAdmin = numServiceForAdmin;
+	}
+
+	public int getNumOrderForAdmin() {
+		return numOrderForAdmin;
+	}
+
+	public void setNumOrderForAdmin(int numOrderForAdmin) {
+		this.numOrderForAdmin = numOrderForAdmin;
 	}
 }

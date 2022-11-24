@@ -40,7 +40,10 @@ public class ProfileAPI {
 		response.setNumOrderWaiting(userService.totalOrderItemsStatusForUser("waiting"));
 		response.setNumOrderApproved(userService.totalOrderItemsStatusForUser("approved"));
 		response.setNumOrderExperienced(userService.totalOrderItemsStatusForUser("experienced"));
-	
+		
+		response.setNumOrderForAdmin(userService.totalOrderForAdmin());
+		response.setNumServiceForAdmin(userService.totalServiceForAdmin());
+		
 		return response;
 	}
 	
@@ -51,6 +54,10 @@ public class ProfileAPI {
 		response.setNumOrderWaiting(userService.totalOrderItemsStatusForUser("waiting"));
 		response.setNumOrderApproved(userService.totalOrderItemsStatusForUser("approved"));
 		response.setNumOrderExperienced(userService.totalOrderItemsStatusForUser("experienced"));
+		
+		response.setNumOrderForAdmin(userService.totalOrderForAdmin());
+		response.setNumServiceForAdmin(userService.totalServiceForAdmin());
+		
 		return response;
 	}
 	
@@ -72,7 +79,6 @@ public class ProfileAPI {
 			e.printStackTrace();
 			return new MessageResponse("Failed");
 		}
-		
 	}
 	
 //	@GetMapping(value = "/user/orderitem")

@@ -17,6 +17,7 @@ import example.config.jwt.CustomUserDetails;
 import example.entity.OrderEntity;
 import example.entity.OrderItemEntity;
 import example.entity.RoleEntity;
+import example.entity.ServiceEntity;
 import example.entity.UserEntity;
 import example.exception.UserNotFoundException;
 import example.payload.request.ProfileUpdateRequest;
@@ -28,6 +29,7 @@ import example.payload.response.RegisterResponseStatus;
 import example.repository.OrderItemRepository;
 import example.repository.OrderRepository;
 import example.repository.RoleRepository;
+import example.repository.ServiceRepository;
 import example.repository.UserRepository;
 import example.service.IUserService;
 
@@ -45,6 +47,9 @@ public class UserService implements IUserService, UserDetailsService {
 	
 	@Autowired
 	private OrderItemRepository orderItemRepository;
+	
+	@Autowired
+	private ServiceRepository serviceRepository;
 
 	@Override
 	public RegisterResponseStatus createUser(RegisterRequest request) {
@@ -72,6 +77,7 @@ public class UserService implements IUserService, UserDetailsService {
 			entity.setPassword(new BCryptPasswordEncoder().encode(entity.getPassword()));
 			entity.setCreateDate(new Date());
 			entity.setModifiedDate(new Date());
+			entity.setProvider(request.isProvider());
 			// Save to database
 			entity = userRepository.save(entity);
 			
@@ -217,5 +223,44 @@ public class UserService implements IUserService, UserDetailsService {
 		UserEntity response = userRepository.save(userEntity);
 		
 		return getProfile();
+	}
+
+	@Override
+	public int totalOrderForAdmin() {
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		List<ServiceEntity> services = serviceRepository.findAllByUserService(userEntity);
+		
+		if (services == null) {
+			return 0;
+		} else {
+			int total = 0;
+			for (int i = 0; i < services.size(); i++) {
+				List<OrderItemEntity> orders = orderItemRepository.findAllByServiceOrderItem(services.get(i));
+				if (orders != null) {
+					total = total + orders.size();
+				}
+			}
+			return total;
+		}
+	}
+
+	@Override
+	public int totalServiceForAdmin() {
+		// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		List<ServiceEntity> services = serviceRepository.findAllByUserService(userEntity);
+		System.out.println("===========" + services.size());
+		if (services == null) {
+			return 0;
+		} else {
+			return services.size();
+		}
 	}
 }

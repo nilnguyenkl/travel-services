@@ -49,6 +49,9 @@ public class UserEntity {
 	private String avatar;
 	
 	@Column
+	private boolean provider;
+	
+	@Column
 	private Date createDate;
 	
 	@Column
@@ -219,5 +222,12 @@ public class UserEntity {
 	public void setListFavorite(List<FavoriteEntity> listFavorite) {
 		this.listFavorite = listFavorite;
 	}
-	
+
+	public boolean isProvider() {
+		return provider;
+	}
+
+	public void setProvider(boolean provider) {
+		this.provider = provider;
+	}
 }

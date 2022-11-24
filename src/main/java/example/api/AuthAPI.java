@@ -72,8 +72,8 @@ public class AuthAPI {
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 		RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-		return new LoginResponse(jwt, refreshToken.getToken(), userDetails.getId(), userDetails.getUsername(),
-				userDetails.getEmail(), roles);
+		return new LoginResponse(jwt, refreshToken.getToken(), userDetails.getId(), userDetails.getUsername(), user.getPhone(),
+				userDetails.getEmail(), roles, user.isProvider());
 	}
 	
 	@PostMapping("/auth/changepassword")

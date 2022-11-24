@@ -14,6 +14,7 @@ import example.payload.request.InforRequest;
 import example.payload.request.OrderRequest;
 import example.payload.response.CalenderOrderResponse;
 import example.payload.response.GetOrderItemResponse;
+import example.payload.response.MessageResponse;
 import example.payload.response.OrderObjectResponse;
 import example.payload.response.OrderResponse;
 import example.payload.response.RangeOrderResponse;
@@ -37,4 +38,9 @@ public interface IOrderService {
 	RangeOrderResponse rangeOrder(String day, Long idService);
 	
 	List<GetOrderItemResponse> getAllOrderItemByStatus(String status);
+	
+	List<GetOrderItemResponse> getAllAdminOrderItemByStatus(String status);
+	
+	void updateStatusOrderItem(String status, Long idOrderItem);
+	
 }

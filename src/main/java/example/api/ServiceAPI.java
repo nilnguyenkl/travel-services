@@ -34,6 +34,7 @@ import example.payload.request.ScheduleRequest;
 import example.payload.request.TicketRequest;
 import example.payload.response.GetServiceByAdminResponse;
 import example.payload.response.GetServiceDetailsResponse;
+import example.payload.response.LinkDataDetailsResponse;
 import example.payload.response.LinkDataResponse;
 import example.payload.response.MessageResponse;
 import example.payload.response.ScheduleResponse;
@@ -106,7 +107,7 @@ public class ServiceAPI {
 	}
 	
 	@DeleteMapping(value = "/admin/delete/{idLink}")
-	public ResponseEntity<?> deleteData(@PathVariable("idLink") String id, @RequestParam String publicId) {
+	public ResponseEntity<List<LinkDataDetailsResponse>> deleteData(@PathVariable("idLink") String id, @RequestParam String publicId, @RequestParam String idService) {
 		LinkDataEntity linkDataEntity = linkDataRepository.findOneById(Long.parseLong(id));
 		try {
 			if (linkDataEntity.getType().equals("image")) {
@@ -119,7 +120,19 @@ public class ServiceAPI {
 		} catch (IOException e) {
 			throw new ServiceException("Can not delete data");
 		}
-		return ResponseEntity.ok(new MessageResponse("Success"));
+		
+		List<LinkDataDetailsResponse> listResponse = new ArrayList<>();
+		List<LinkDataEntity> links = linkDataRepository.findAllByServiceStorageId(Long.parseLong(idService));
+		
+		for (LinkDataEntity entity : links) {
+			LinkDataDetailsResponse response = new LinkDataDetailsResponse();
+			response.setId(entity.getId());
+			response.setPublicId(entity.getPublicId());
+			response.setType(entity.getType());
+			response.setUrl(entity.getDataUrl());
+			listResponse.add(response);
+		}
+		return ResponseEntity.ok(listResponse);
 	}
 	
 	@PostMapping(value = "/admin/service")
@@ -210,7 +223,4 @@ public class ServiceAPI {
 	public GetServiceDetailsResponse getServiceDetails(@RequestParam("idService") String idService) {
 		return serviceService.getServiceDetailss(Long.parseLong(idService));
 	}
-	
-	
-	
 }

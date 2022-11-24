@@ -5,12 +5,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import example.config.jwt.CustomUserDetails;
 import example.elasticsearch.ESMService;
 import example.elasticsearch.ESMTicket;
@@ -26,6 +31,7 @@ import example.payload.request.InforRequest;
 import example.payload.request.OrderRequest;
 import example.payload.response.CalenderOrderResponse;
 import example.payload.response.GetOrderItemResponse;
+import example.payload.response.MessageResponse;
 import example.payload.response.OrderItemResponse;
 import example.payload.response.OrderObjectResponse;
 import example.payload.response.OrderResponse;
@@ -80,6 +86,9 @@ public class OrderService implements IOrderService {
 	
 	@Autowired
 	ESServiceRepository esServiceRepository;
+	
+	@Autowired
+	JavaMailSender mailSender;
 
 	@Override
 	public Optional<OrderResponse> createOrder(OrderRequest request) {
@@ -120,7 +129,7 @@ public class OrderService implements IOrderService {
 				orderItem.setOrderOrderItem(rsOrder);
 				orderItem.setTotal(totalOrderItemPrice(request.getItems().get(i).getTickets()));
 				orderItem.setServiceOrderItem(serviceRepository.findOneById(request.getItems().get(i).getIdService()));
-				orderItem.setStatus("order");
+				orderItem.setStatus("waiting");
 				OrderItemEntity rsOrderItem = orderItemRepository.save(orderItem);
 				listOrderItem.add(rsOrderItem);
 				
@@ -441,4 +450,118 @@ public class OrderService implements IOrderService {
 		}
 		return listResponse;
 	}
+
+
+	@Override
+	public List<GetOrderItemResponse> getAllAdminOrderItemByStatus(String status) {
+		/// Authentication
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+		UserEntity userEntity = userRepository.findOneByUsername(userDetails.getUsername());
+		
+		List<GetOrderItemResponse> listResponse = new ArrayList<>();
+		
+		List<ServiceEntity> listService = serviceRepository.findAllByUserService(userEntity);
+				
+		for (ServiceEntity service : listService) {
+			List<OrderItemEntity> listOrderItem = orderItemRepository.findAllByServiceOrderItemAndStatus(service, status);
+			for (OrderItemEntity item : listOrderItem) {
+				
+				// OrderEntity entity = orderRepository.findOneById(null);
+				
+				InforRequest infor = new InforRequest();
+				infor.setEmail(item.getOrderOrderItem().getEmail());
+				infor.setFullname(item.getOrderOrderItem().getFullname());
+				infor.setPhone(item.getOrderOrderItem().getPhone());
+				
+				List<OrderItemByTicketEntity> tickets = orderItemByTicketRepository.findAllByOrderItemById(item.getId());
+				List<TicketResponse> listTicketResponse = new ArrayList<>();
+				for (OrderItemByTicketEntity ticket : tickets) {
+					TicketResponse ticketResponse = new TicketResponse();
+					ticketResponse.setIdTicket(ticket.getId());
+					ticketResponse.setAmountTicket(ticket.getAmount());
+					ticketResponse.setTypeTicket(ticket.getType());
+					ticketResponse.setValueTicket(ticket.getCurrentPrice());
+					ticketResponse.setNote(ticket.getTicketBy().getNote());
+					listTicketResponse.add(ticketResponse);
+				}
+				
+				
+				GetOrderItemResponse response = new GetOrderItemResponse();
+				
+				response.setId(item.getId());
+				response.setIdOrder(item.getOrderOrderItem().getId());
+				response.setIdService(service.getId());
+				response.setNameService(service.getName());
+				response.setDescription(service.getDescription());
+				response.setUrl(esServiceRepository.findOneById(item.getServiceOrderItem().getId()).getImage());
+				response.setBookDay(item.getBookDay());
+				response.setBookTime(item.getBookTime());
+				response.setTotal(item.getTotal());
+				response.setInfor(infor);
+				response.setTickets(listTicketResponse);
+				response.setCreateDate(item.getCreateDate());
+				response.setModifiedDate(item.getModifiedDate());
+				
+				listResponse.add(response);
+			}
+		}
+		
+		return listResponse;
+	}
+
+
+	@Override
+	public void updateStatusOrderItem(String status, Long idOrderItem) {
+		OrderItemEntity item = orderItemRepository.findOneById(idOrderItem);
+		item.setStatus(status);
+		OrderItemEntity itemResponse = orderItemRepository.save(item);
+		
+		
+		
+		String textStatus = "";
+		String content = "";
+		
+		if (status.equals("approved")) {
+			textStatus = "Your order " + idOrderItem + " has been approved.";
+		}
+		if (status.equals("deleted")) {
+			textStatus = "Your order " + idOrderItem + " has been deleted.";
+		}
+		
+		content = content + textStatus + "<br>";
+		content = content + "<b>About</b><br>";
+		content = content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name: " + itemResponse.getServiceOrderItem().getName() + "<br>";
+		content = content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Time: " + itemResponse.getBookDay() + " " + itemResponse.getBookTime() + "<br>";
+		content = content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tickets: <br>";
+		
+		for (int i = 0; i < itemResponse.getListOrderByTicket().size(); i++) {
+			int index = i + 1;
+			content = content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Ticket " + index + "<br>";
+			content = content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "+ Type: " + itemResponse.getListOrderByTicket().get(i).getType() + "<br>";
+			content = content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "+ Value: " + itemResponse.getListOrderByTicket().get(i).getCurrentPrice() + "<br>";
+			content = content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "+ Amount: " + itemResponse.getListOrderByTicket().get(i).getAmount() + "<br>";
+		}
+		content = content + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total: " + itemResponse.getTotal() + "<br>";
+		content = content + "<img src=\"" + esServiceRepository.findOneById(itemResponse.getServiceOrderItem().getId()).getImage() + "\" width=\"300\" height=\"300\">";
+		// Send Email
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message);
+		
+		try {
+			helper.setFrom("quocnil2000@gmail.com");
+			helper.setTo(itemResponse.getOrderOrderItem().getEmail());
+			helper.setText(content, true);
+			helper.setSubject("From FTravel");
+			mailSender.send(message);
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+	
+	
+	
 }

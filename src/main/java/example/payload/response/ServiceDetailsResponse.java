@@ -8,6 +8,8 @@ public class ServiceDetailsResponse {
 	private Long id;
 	private String name;
 	private String address;
+	private String area;
+	private String category;
 	private String description;
 	private String event;
 	private String note;
@@ -80,5 +82,17 @@ public class ServiceDetailsResponse {
 	}
 	public void setUsernameAuth(String usernameAuth) {
 		this.usernameAuth = usernameAuth;
+	}
+	public String getArea() {
+		return area;
+	}
+	public void setArea(String area) {
+		this.area = area;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
 	}	
 }

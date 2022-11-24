@@ -11,4 +11,6 @@ import example.entity.UserEntity;
 public interface ServiceRepository extends JpaRepository<ServiceEntity, Long>{
 	ServiceEntity findOneById(Long id);
 	List<ServiceEntity> findAllByUserService(UserEntity user, Sort sort);
+	
+	List<ServiceEntity> findAllByUserService(UserEntity user);
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import example.elasticsearch.ESMSchedule;
 import example.entity.ScheduleEntity;
+import example.payload.request.CreateScheduleRequest;
 import example.payload.request.ScheduleRequest;
 import example.payload.response.ScheduleResponse;
 import example.repository.ScheduleRepository;
@@ -58,6 +59,19 @@ public class ScheduleService implements IScheduleService {
 		}
 		
 		return list;
+	}
+
+	@Override
+	public ScheduleResponse createSchedule1(CreateScheduleRequest request) {
+		ScheduleEntity entity = new ScheduleEntity();
+		entity.setQuantityperday(request.getQuantityPerDay());
+		entity.setTime(request.getTime());
+		entity.setServiceSchedule(serviceRepository.findOneById(request.getIdService()));
+		
+		
+		
+		return convertToScheduleResponse(scheduleRepository.save(entity));
+		
 	}
 
 }

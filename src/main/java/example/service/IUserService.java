@@ -18,5 +18,8 @@ public interface IUserService {
 	ProfileResponse updateProfile(ProfileUpdateRequest request);
 	
 	ProfileResponse updateAvatar(String avartar);
+	
+	int totalOrderForAdmin();
+	int totalServiceForAdmin();
 	// int totalOrder();
 }
