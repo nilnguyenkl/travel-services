@@ -43,4 +43,6 @@ public interface IOrderService {
 	
 	void updateStatusOrderItem(String status, Long idOrderItem);
 	
+	MessageResponse updateStatusOrderItemForUser(String status, long idOrderItem);
+	
 }

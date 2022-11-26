@@ -21,8 +21,8 @@ public class ReviewAPI {
 	ReviewService reviewService;
 	
 	@PostMapping(value = "/customer/review")
-	public MessageResponse createReview(@RequestParam long idService, @RequestParam String content) {
-		ReviewEntity reviewEntity = reviewService.createReview(idService, content);
+	public MessageResponse createReview(@RequestParam long idService, @RequestParam String content, @RequestParam String point) {
+		ReviewEntity reviewEntity = reviewService.createReview(idService, content, point);
 		if (reviewEntity != null) {
 			return new MessageResponse("Success");
 		} else {

@@ -130,9 +130,12 @@ public class OrderAPI {
 			List<GetOrderItemResponse> listSlit = list.stream().limit(limit).collect(Collectors.toList());
 			response.setData(listSlit);
 		}
-		
 		return response;
-		
+	}
+	
+	@PutMapping(value = "/user/orderitem/update")
+	public MessageResponse updateOrderItemStatus(@RequestParam("idOrderItem") String idOrderItem, @RequestParam("status") String status) {
+		return orderService.updateStatusOrderItemForUser(status, Long.parseLong(idOrderItem));
 	}
 	
 	

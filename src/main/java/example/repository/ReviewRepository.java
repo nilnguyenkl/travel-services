@@ -10,4 +10,5 @@ import example.entity.ReviewEntity;
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
 	ReviewEntity findOneById(Long id);
 	List<ReviewEntity> findAllByServiceReviewId(Long id, Sort sort);
+	List<ReviewEntity> findAllByServiceReviewId(Long id);
 }

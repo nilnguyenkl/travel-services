@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import example.elasticsearch.model.ServiceModel;
 import example.payload.response.AbloutAppResponse;
 import example.payload.response.AreaResponse;
 import example.payload.response.CategoryResponse;
+import example.payload.response.FavoriteAreaResponse;
 import example.payload.response.GetServiceResponse;
 import example.payload.response.ServiceDetailsResponse;
 import example.repository.OrderItemRepository;
@@ -127,4 +129,16 @@ public class PublicAPI {
 		
 		return response; 
 	}
+	
+	@GetMapping(value = "/public/favoriteArea")
+	public List<FavoriteAreaResponse> getFavoriteArea() {
+		return areaService.getFavoriteAreaResponse();
+	}
+	
+	@GetMapping(value = "/public/favoriteService")
+	public List<ServiceModel> getFavoriteService() {
+		return esService.getAllSortByOrder();
+	}
+	
+	
 }

@@ -28,7 +28,7 @@ public class ReviewService implements IReviewService {
 	ServiceRepository serviceRepository;
 	
 	@Override
-	public ReviewEntity createReview(Long idService, String content) {
+	public ReviewEntity createReview(Long idService, String content, String point) {
 		ReviewEntity reviewEntity = new ReviewEntity();
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -39,6 +39,7 @@ public class ReviewService implements IReviewService {
 		reviewEntity.setContent(content);
 		reviewEntity.setCreateDate(new Date());
 		reviewEntity.setServiceReview(serviceRepository.findOneById(idService));
+		reviewEntity.setPoint(Float.parseFloat(point));
 		reviewEntity.setModifiedDate(new Date());
 		reviewEntity.setUserReview(userEntity);
 		

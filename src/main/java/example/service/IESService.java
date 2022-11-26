@@ -15,4 +15,6 @@ public interface IESService {
 	
 	// Search
 	List<ServiceModel> getAllService(Pageable pageable, Long idCategory, Long idArea, String search);
+	
+	List<ServiceModel> getAllSortByOrder();
 }

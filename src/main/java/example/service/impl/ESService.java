@@ -6,6 +6,7 @@ import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import example.elasticsearch.ESMService;
 import example.elasticsearch.model.ServiceModel;
+import example.entity.ReviewEntity;
 import example.repository.ESServiceRepository;
+import example.repository.ReviewRepository;
 import example.service.IESService;
 
 @Service
@@ -27,6 +30,9 @@ public class ESService implements IESService {
 	
 	@Autowired
 	private ElasticsearchOperations elasticsearchOperations;
+	
+	@Autowired
+	private ReviewRepository reviewRepo;
 	
 	private static final String PRODUCT_INDEX = "service";
 
@@ -145,8 +151,42 @@ public class ESService implements IESService {
 		model.setModifiedDate(request.getModifiedDate());
 		model.setName(request.getName());
 		model.setOrders(request.getOrders());
-		model.setReviews(request.getReviews());
 		model.setTicket(request.getTicket());
+		
+		List<ReviewEntity> reviews = reviewRepo.findAllByServiceReviewId(request.getId());
+		// Set reviews
+		if (reviews.isEmpty()) {
+			model.setReviews(0);
+			model.setPoint(0);
+		} else {
+			float point = 0;
+			for (ReviewEntity entity : reviews) {
+				point = point + entity.getPoint();
+			}
+			model.setReviews(reviews.size());
+			model.setPoint(point/reviews.size());
+		}
 		return model;
+	}
+
+	@Override
+	public List<ServiceModel> getAllSortByOrder() {
+		List<ServiceModel> response = new ArrayList<>();
+		List<ESMService> services = (List<ESMService>) esRepository.findAll(Sort.by("orders").descending());
+		
+		for (ESMService service : services) {
+			response.add(convertToServiceModel(service));
+		}
+		
+		if (services.size() > 20) {
+			for (int i = 0; i < 20; i++) {
+				response.add(convertToServiceModel(services.get(i)));
+			}
+		} else {
+			for (int i = 0; i < services.size(); i++) {
+				response.add(convertToServiceModel(services.get(i)));
+			}
+		}
+		return response;
 	}
 }

@@ -29,6 +29,8 @@ public class ServiceModel {
 	
 	private int orders;
 	
+	private float point;
+	
 	private Date createDate;
 
 	private Date modifiedDate;
@@ -127,6 +129,14 @@ public class ServiceModel {
 
 	public void setAddress(String address) {
 		this.address = address;
-	}	
+	}
+
+	public float getPoint() {
+		return point;
+	}
+
+	public void setPoint(float point) {
+		this.point = point;
+	}
 	
 }

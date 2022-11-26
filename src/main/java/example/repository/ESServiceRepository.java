@@ -9,6 +9,7 @@ import example.elasticsearch.ESMService;
 public interface ESServiceRepository extends ElasticsearchRepository<ESMService, Long>{
 	
 	ESMService findOneById(Long id);
+	
 //	
 //	Page<ESMService> findAllByIdCategory(Long id, Pageable pageable);
 //	Page<ESMService> findAllByIdArea(Long id, Pageable pageable);

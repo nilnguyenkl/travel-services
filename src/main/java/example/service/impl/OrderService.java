@@ -561,6 +561,15 @@ public class OrderService implements IOrderService {
 	}
 
 
+	@Override
+	public MessageResponse updateStatusOrderItemForUser(String status, long idOrderItem) {		
+		OrderItemEntity item = orderItemRepository.findOneById(idOrderItem);
+		item.setStatus(status);
+		orderItemRepository.save(item);
+		return new MessageResponse("Success");
+	}
+
+
 	
 	
 	

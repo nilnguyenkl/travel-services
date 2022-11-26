@@ -63,6 +63,9 @@ public class SecurityConfig {
 		http.authenticationProvider(authenticationProvider());
 		
 		http.authorizeRequests()
+				.antMatchers("/user/orderitem/update").permitAll()
+				.antMatchers("/public/favoriteService").permitAll()
+				.antMatchers("/public/favoriteArea").permitAll()
 				.antMatchers("/auth/register").permitAll()
 				.antMatchers("/auth/refreshtoken").permitAll()
 				.antMatchers("/auth/changepassword").permitAll()
