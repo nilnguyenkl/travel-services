@@ -174,10 +174,6 @@ public class ESService implements IESService {
 		List<ServiceModel> response = new ArrayList<>();
 		List<ESMService> services = (List<ESMService>) esRepository.findAll(Sort.by("orders").descending());
 		
-		for (ESMService service : services) {
-			response.add(convertToServiceModel(service));
-		}
-		
 		if (services.size() > 20) {
 			for (int i = 0; i < 20; i++) {
 				response.add(convertToServiceModel(services.get(i)));

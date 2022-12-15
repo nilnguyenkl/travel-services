@@ -552,7 +552,7 @@ public class OrderService implements IOrderService {
 			helper.setFrom("quocnil2000@gmail.com");
 			helper.setTo(itemResponse.getOrderOrderItem().getEmail());
 			helper.setText(content, true);
-			helper.setSubject("From FTravel");
+			helper.setSubject("From FTService");
 			mailSender.send(message);
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block

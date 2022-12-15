@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import example.config.jwt.CustomUserDetails;
+import example.elasticsearch.ESMService;
 import example.entity.FavoriteEntity;
 import example.entity.LinkDataEntity;
 import example.entity.ReviewEntity;
@@ -19,6 +20,7 @@ import example.entity.TicketEntity;
 import example.entity.UserEntity;
 import example.payload.response.FavoriteResponse;
 import example.payload.response.MessageResponse;
+import example.repository.ESServiceRepository;
 import example.repository.FavoriteRepository;
 import example.repository.LinkDataRepository;
 import example.repository.ReviewRepository;
@@ -48,6 +50,9 @@ public class FavoriteService implements IFavoriteService {
 	
 	@Autowired
 	ReviewRepository reviewRepository;
+	
+	@Autowired
+	private ESServiceRepository esRepository;
 	
 	@Override
 	public List<FavoriteResponse> getAllFavoriteByUser() {
@@ -90,9 +95,11 @@ public class FavoriteService implements IFavoriteService {
 				favorite.setPointReviews(totalStar/reviews.size());
 			}
 			
-			favorite.setOrders(0);
+			ESMService service1 = esRepository.findOneById(entity.getServiceFavorite().getId());
 			
-			List<TicketEntity> ticketEntities = ticketRepository.findAllByServiceTicketIdOrderByValueAsc(service.getId());
+			favorite.setOrders(service1.getOrders());
+			
+			List<TicketEntity> ticketEntities = ticketRepository.findAllByServiceTicketIdOrderByValueAsc(service1.getId());
 			favorite.setMinPrice(ticketEntities.get(0).getValue());
 			
 			favorites.add(favorite);

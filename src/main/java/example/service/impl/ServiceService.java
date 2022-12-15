@@ -274,6 +274,7 @@ public class ServiceService implements IServiceService {
 		infor.setDescription(service.getDescription());
 		infor.setEvent(service.getEvent());
 		infor.setAddress(service.getAddress());
+		infor.setNote(service.getNote());
 		infor.setCategory(cate);
 		infor.setArea(are);
 		
